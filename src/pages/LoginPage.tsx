@@ -1,25 +1,27 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext'
 
 function LoginPage() {
+  const { login, error: authError, loading: authLoading } = useAuth()
+  const navigate = useNavigate()
+  
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
-    setIsLoading(true)
-
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false)
-      // For demo purposes, always show error
-      setError('Funkcionalnost prijave još uvek nije implementirana.')
-    }, 1500)
+    
+    try {
+      await login(email, password)
+      navigate('/mapa') // Redirect to map page after successful login
+    } catch (err) {
+      setError('Greška prilikom prijave. Proverite vaše podatke i pokušajte ponovo.')
+    }
   }
 
   const toggleShowPassword = () => {
@@ -40,9 +42,9 @@ function LoginPage() {
 
             <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
               <div className="p-6">
-                {error && (
+                {(error || authError) && (
                   <div className="bg-destructive/10 border border-destructive/20 text-destructive rounded-md p-3 mb-6">
-                    {error}
+                    {error || authError}
                   </div>
                 )}
 

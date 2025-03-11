@@ -14,9 +14,6 @@ import MapaPage from './pages/MapaPage'
 import ObavestiMe from './pages/ObavestiMe'
 import ZboroviPage from './pages/ZboroviPage'
 import PlenumiPage from './pages/PlenumiPage'
-import LoginPage from './pages/LoginPage'
-import RegisterPage from './pages/RegisterPage'
-import ProfilePage from './pages/ProfilePage'
 import NotFoundPage from './pages/NotFoundPage'
 
 function App() {
@@ -55,9 +52,6 @@ function App() {
               <Route path="/obavesti-me" element={<ObavestiMe />} />
               <Route path="/zborovi" element={<ZboroviPage />} />
               <Route path="/plenumi" element={<PlenumiPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </main>
