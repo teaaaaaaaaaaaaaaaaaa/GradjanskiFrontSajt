@@ -1,34 +1,28 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 
-type Theme = 'dark' | 'light'
+type Theme = 'light'
 
 interface ThemeContextType {
   theme: Theme
-  setTheme: (theme: Theme) => void
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 interface ThemeProviderProps {
   children: ReactNode
-  defaultTheme?: Theme
 }
 
-function ThemeProvider({ children, defaultTheme = 'light' }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem('theme') as Theme) || defaultTheme
-  )
+function ThemeProvider({ children }: ThemeProviderProps) {
+  const [theme] = useState<Theme>('light')
 
   useEffect(() => {
     const root = window.document.documentElement
-    root.classList.remove('light', 'dark')
+    root.classList.remove('dark')
     root.classList.add(theme)
-    localStorage.setItem('theme', theme)
   }, [theme])
 
   const value = {
     theme,
-    setTheme,
   }
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
