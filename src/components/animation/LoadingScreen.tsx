@@ -72,7 +72,7 @@ function LoadingScreen({ onComplete }: { onComplete: () => void }) {
               ? 'opacity-100 translate-y-0' 
               : 'opacity-0 translate-y-4'
           } ${
-            animationStage === 'complete' ? 'scale-110 text-primary-dark' : ''
+            animationStage === 'complete' ? 'scale-110 text-black-dark' : ''
           }`}
         >
           {(animationStage === 'text-visible' || animationStage === 'complete') && (

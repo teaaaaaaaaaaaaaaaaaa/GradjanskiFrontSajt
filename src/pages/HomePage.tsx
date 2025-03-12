@@ -315,20 +315,18 @@ function HomePage() {
               <p className="text-lg text-foreground/80 mb-6">
                 Pronađite najbliže zborove u vašem okruženju. Pratite novosti i uključite se u rad lokalne zajednice kroz zborove građana. <br></br><strong>Zajedno možemo napraviti promene koje su nam potrebne.</strong>
               </p>
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-start">
-                  <div className="h-6 w-6 rounded-full map-status-yellow mr-3 mt-1"></div>
-                  <div>
-                    <span className="font-medium">Crvena oznaka (svetlija)</span> - Zbor nije sazvan
-                  </div>
-                </li>
-                <li className="flex items-start">
-                  <div className="h-6 w-6 rounded-full map-status-blue mr-3 mt-1"></div>
-                  <div>
-                    <span className="font-medium">Crvena oznaka</span> - Zbor je sazvan
-                  </div>
-                </li>
-              </ul>
+              <div className="flex items-center mb-2">
+                <div className="w-4 h-4 rounded-full bg-red-500 mr-2"></div>
+                <span className="text-sm">Zbor čeka na vas - Budite inicijator promene u vašoj zajednici</span>
+              </div>
+              <div className="flex items-center mb-2">
+                <div className="w-4 h-4 rounded-full bg-yellow-500 mr-2"></div>
+                <span className="text-sm">Zbor je zakazan - Pridružite se i dajte svoj glas</span>
+              </div>
+              <div className="flex items-center mb-2">
+                <div className="w-4 h-4 rounded-full bg-green-500 mr-2"></div>
+                <span className="text-sm">Zbor je potvrđen - Održaće se uskoro</span>
+              </div>
               <Link
                 to="/zborovi"
                 className="gf-button gf-button-primary rounded-md inline-flex items-center justify-center"

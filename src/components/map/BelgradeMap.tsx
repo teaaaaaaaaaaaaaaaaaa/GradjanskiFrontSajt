@@ -166,11 +166,11 @@ function BelgradeMap({
           <div className="space-y-2">
             <div className="flex items-center">
               <div className="w-4 h-4 rounded-full bg-yellow-500 mr-2"></div>
-              <span className="text-sm">Nije sazvan</span>
+              <span className="text-sm">Sazvan</span>
             </div>
             <div className="flex items-center">
               <div className="w-4 h-4 rounded-full bg-red-500 mr-2"></div>
-              <span className="text-sm">Sazvan</span>
+              <span className="text-sm">Nije sazvan</span>
             </div>
             <div className="flex items-center">
               <div className="w-4 h-4 rounded-full bg-green-500 mr-2"></div>
