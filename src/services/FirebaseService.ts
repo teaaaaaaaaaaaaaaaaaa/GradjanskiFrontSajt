@@ -57,16 +57,293 @@ export interface Assembly {
 
 // Mock podaci za lokalne zajednice u Beogradu
 export const localCommunities = [
-  { id: 'vracar', name: 'Vračar', coordinates: { lat: 44.798, lng: 20.4769 } },
-  { id: 'savski_venac', name: 'Savski Venac', coordinates: { lat: 44.8019, lng: 20.4551 } },
-  { id: 'stari_grad', name: 'Stari Grad', coordinates: { lat: 44.8184, lng: 20.4612 } },
-  { id: 'novi_beograd', name: 'Novi Beograd', coordinates: { lat: 44.8125, lng: 20.4273 } },
-  { id: 'zemun', name: 'Zemun', coordinates: { lat: 44.8417, lng: 20.4011 } },
-  { id: 'palilula', name: 'Palilula', coordinates: { lat: 44.8141, lng: 20.4769 } },
-  { id: 'zvezdara', name: 'Zvezdara', coordinates: { lat: 44.7981, lng: 20.5042 } },
-  { id: 'cukarica', name: 'Čukarica', coordinates: { lat: 44.7808, lng: 20.4143 } },
-  { id: 'rakovica', name: 'Rakovica', coordinates: { lat: 44.7469, lng: 20.4425 } },
-  { id: 'vozdovac', name: 'Voždovac', coordinates: { lat: 44.7667, lng: 20.4831 } },
+  {
+    id: '4-juli',
+    name: 'Mesna zajednica 4. juli',
+    address: 'Milenka Vesnića 3',
+    postalCode: '11040 Beograd (Savski Venac)',
+    coordinates: { lat: 44.7872, lng: 20.4673 }
+  },
+  {
+    id: 'akademija',
+    name: 'Mesna zajednica Akademija',
+    address: 'Bulevar umetnosti 27',
+    postalCode: '11070 Beograd (Novi Beograd)',
+    coordinates: { lat: 44.8175, lng: 20.4147 }
+  },
+  {
+    id: 'autokomanda',
+    name: 'Mesna zajednica Autokomanda',
+    address: 'Limska 15',
+    postalCode: '11010 Beograd (Voždovac)',
+    coordinates: { lat: 44.7872, lng: 20.4673 }
+  },
+  {
+    id: 'avala-grad',
+    name: 'Mesna zajednica Avala grad',
+    address: 'Milene Pavlović Barili 6V',
+    postalCode: '11231 Beograd (Rakovica)',
+    coordinates: { lat: 44.7469, lng: 20.4425 }
+  },
+  {
+    id: 'banjica',
+    name: 'Mesna zajednica Banjica',
+    address: 'Bulevar oslobođenja 96',
+    postalCode: '11042 Beograd (Voždovac)',
+    coordinates: { lat: 44.7667, lng: 20.4831 }
+  },
+  {
+    id: 'bara-reva',
+    name: 'Mesna zajednica Bara Reva',
+    address: 'Pančevački put 91',
+    postalCode: '11210 Beograd (Palilula)',
+    coordinates: { lat: 44.8141, lng: 20.4969 }
+  },
+  {
+    id: 'bele-vode',
+    name: 'Mesna zajednica Bele vode',
+    address: 'Belo vrelo 1',
+    postalCode: '11147 Beograd (Čukarica)',
+    coordinates: { lat: 44.7808, lng: 20.4143 }
+  },
+  {
+    id: 'beli-potok',
+    name: 'Mesna zajednica Beli Potok',
+    address: 'Vase Čarapića 48',
+    postalCode: '11223 Beli Potok',
+    coordinates: { lat: 44.7067, lng: 20.5167 }
+  },
+  {
+    id: 'bezanija',
+    name: 'Mesna zajednica Bežanija',
+    address: 'Pere Segedinca 13',
+    postalCode: '11073 Beograd (Novi Beograd)',
+    coordinates: { lat: 44.8125, lng: 20.4273 }
+  },
+  {
+    id: 'bezanijska-kosa',
+    name: 'Mesna zajednica Bežanijska kosa',
+    address: 'Partizanske avijacije 25',
+    postalCode: '11077 Beograd (Novi Beograd)',
+    coordinates: { lat: 44.8217, lng: 20.3873 }
+  },
+  {
+    id: 'zvezdara',
+    name: 'Mesna zajednica Zvezdara',
+    address: 'Bulevar kralja Aleksandra 243',
+    postalCode: '11160 Beograd (Zvezdara)',
+    coordinates: { lat: 44.7983, lng: 20.4919 }
+  },
+  {
+    id: 'blok-21',
+    name: 'Mesna zajednica Blok 21',
+    address: 'Bulevar Zorana Đinđića 76',
+    postalCode: '11070 Beograd (Novi Beograd)',
+    coordinates: { lat: 44.8153, lng: 20.4283 }
+  },
+  {
+    id: 'blok-28',
+    name: 'Mesna zajednica Blok 28',
+    address: 'Bulevar Arsenija Čarnojevića 81',
+    postalCode: '11070 Beograd (Novi Beograd)',
+    coordinates: { lat: 44.8183, lng: 20.4133 }
+  },
+  {
+    id: 'blok-29',
+    name: 'Mesna zajednica Blok 29',
+    address: 'Španskih boraca 2',
+    postalCode: '11070 Beograd (Novi Beograd)',
+    coordinates: { lat: 44.8167, lng: 20.4217 }
+  },
+  {
+    id: 'blok-30',
+    name: 'Mesna zajednica Blok 30',
+    address: 'Bulevar Mihajla Pupina 167',
+    postalCode: '11070 Beograd (Novi Beograd)',
+    coordinates: { lat: 44.8233, lng: 20.4183 }
+  },
+  {
+    id: 'blok-45',
+    name: 'Mesna zajednica Blok 45',
+    address: 'Jurija Gagarina 221',
+    postalCode: '11070 Beograd (Novi Beograd)',
+    coordinates: { lat: 44.7983, lng: 20.3867 }
+  },
+  {
+    id: 'blok-61',
+    name: 'Mesna zajednica Blok 61',
+    address: 'Dr Ivana Ribara 91',
+    postalCode: '11070 Beograd (Novi Beograd)',
+    coordinates: { lat: 44.8033, lng: 20.3733 }
+  },
+  {
+    id: 'blok-62',
+    name: 'Mesna zajednica Blok 62',
+    address: 'Nehruova 82',
+    postalCode: '11070 Beograd (Novi Beograd)',
+    coordinates: { lat: 44.8017, lng: 20.3783 }
+  },
+  {
+    id: 'blok-63',
+    name: 'Mesna zajednica Blok 63',
+    address: 'Gandijeva 114',
+    postalCode: '11070 Beograd (Novi Beograd)',
+    coordinates: { lat: 44.8050, lng: 20.3800 }
+  },
+  {
+    id: 'borca-3',
+    name: 'Mesna zajednica Borča 3',
+    address: 'Valjevskog odreda 70',
+    postalCode: '11211 Beograd (Palilula)',
+    coordinates: { lat: 44.8733, lng: 20.4583 }
+  },
+  {
+    id: 'braće-jerković',
+    name: 'Mesna zajednica Braće Jerković',
+    address: 'Meštrovićeva 34',
+    postalCode: '11010 Beograd (Voždovac)',
+    coordinates: { lat: 44.7683, lng: 20.4933 }
+  },
+  {
+    id: 'cerak',
+    name: 'Mesna zajednica Cerak',
+    address: 'Jablanička 12',
+    postalCode: '11090 Beograd (Čukarica)',
+    coordinates: { lat: 44.7517, lng: 20.4217 }
+  },
+  {
+    id: 'cerak-vinogradi',
+    name: 'Mesna zajednica Cerak Vinogradi',
+    address: 'Kedrova 2',
+    postalCode: '11090 Beograd (Čukarica)',
+    coordinates: { lat: 44.7483, lng: 20.4183 }
+  },
+  {
+    id: 'cukarica',
+    name: 'Mesna zajednica Čukarica',
+    address: 'Turgenjevljeva 5',
+    postalCode: '11030 Beograd (Čukarica)',
+    coordinates: { lat: 44.7867, lng: 20.4150 }
+  },
+  {
+    id: 'dedinje',
+    name: 'Mesna zajednica Dedinje',
+    address: 'Bulevar kneza Aleksandra Karađorđevića 10b',
+    postalCode: '11040 Beograd (Savski Venac)',
+    coordinates: { lat: 44.7783, lng: 20.4567 }
+  },
+  {
+    id: 'dorcol',
+    name: 'Mesna zajednica Dorćol',
+    address: 'Cara Dušana 82',
+    postalCode: '11000 Beograd (Stari Grad)',
+    coordinates: { lat: 44.8217, lng: 20.4617 }
+  },
+  {
+    id: 'dunav',
+    name: 'Mesna zajednica Dunav',
+    address: 'Cara Dušana 15a',
+    postalCode: '11000 Beograd (Stari Grad)',
+    coordinates: { lat: 44.8233, lng: 20.4583 }
+  },
+  {
+    id: 'fontana',
+    name: 'Mesna zajednica Fontana',
+    address: 'Pariske komune 13',
+    postalCode: '11070 Beograd (Novi Beograd)',
+    coordinates: { lat: 44.8217, lng: 20.4133 }
+  },
+  {
+    id: 'galovica',
+    name: 'Mesna zajednica Galovica',
+    address: 'Džona Kenedija 9',
+    postalCode: '11070 Beograd (Novi Beograd)',
+    coordinates: { lat: 44.8083, lng: 20.3917 }
+  },
+  {
+    id: 'gorica',
+    name: 'Mesna zajednica Gorica',
+    address: 'Učiteljska 60',
+    postalCode: '11050 Beograd (Zvezdara)',
+    coordinates: { lat: 44.7933, lng: 20.4917 }
+  },
+  {
+    id: 'jajinci',
+    name: 'Mesna zajednica Jajinci',
+    address: 'Save Maškovića 3',
+    postalCode: '11223 Beograd (Voždovac)',
+    coordinates: { lat: 44.7367, lng: 20.4867 }
+  },
+  {
+    id: 'kaludjerica',
+    name: 'Mesna zajednica Kaluđerica',
+    address: 'Kralja Petra Prvog 7g',
+    postalCode: '11130 Beograd (Grocka)',
+    coordinates: { lat: 44.7583, lng: 20.5367 }
+  },
+  {
+    id: 'kanarevo-brdo',
+    name: 'Mesna zajednica Kanarevo Brdo',
+    address: 'Bogdana Žerajića 24a',
+    postalCode: '11010 Beograd (Rakovica)',
+    coordinates: { lat: 44.7617, lng: 20.4567 }
+  },
+  {
+    id: 'karaburma',
+    name: 'Mesna zajednica Karaburma',
+    address: 'Uralska 11',
+    postalCode: '11060 Beograd (Palilula)',
+    coordinates: { lat: 44.8150, lng: 20.4933 }
+  },
+  {
+    id: 'kosutnjak',
+    name: 'Mesna zajednica Košutnjak',
+    address: 'Pionirska 4',
+    postalCode: '11030 Beograd (Rakovica)',
+    coordinates: { lat: 44.7633, lng: 20.4367 }
+  },
+  {
+    id: 'kotez',
+    name: 'Mesna zajednica Kotež',
+    address: 'Jovana Isailovića 31',
+    postalCode: '11211 Beograd (Palilula)',
+    coordinates: { lat: 44.8517, lng: 20.4683 }
+  },
+  {
+    id: 'krunski-venac',
+    name: 'Mesna zajednica Krunski venac',
+    address: 'Prote Mateje 36',
+    postalCode: '11000 Beograd (Vračar)',
+    coordinates: { lat: 44.8033, lng: 20.4733 }
+  },
+  {
+    id: 'kumodraz',
+    name: 'Mesna zajednica Kumodraž',
+    address: 'Mokroluška 4',
+    postalCode: '11221 Beograd (Voždovac)',
+    coordinates: { lat: 44.7433, lng: 20.5067 }
+  },
+  {
+    id: 'ledine',
+    name: 'Mesna zajednica Ledine',
+    address: 'Obrenovačka bb',
+    postalCode: '11070 Beograd (Novi Beograd)',
+    coordinates: { lat: 44.8067, lng: 20.3567 }
+  },
+  {
+    id: 'lion',
+    name: 'Mesna zajednica Lion',
+    address: 'Janka Lisjaka 4',
+    postalCode: '11030 Beograd (Čukarica)',
+    coordinates: { lat: 44.7783, lng: 20.4150 }
+  },
+  {
+    id: 'miljakovac',
+    name: 'Mesna zajednica Miljakovac',
+    address: 'Varešska 5',
+    postalCode: '11010 Beograd (Rakovica)',
+    coordinates: { lat: 44.7483, lng: 20.4567 }
+  }
 ];
 
 // Mock podaci za zborove

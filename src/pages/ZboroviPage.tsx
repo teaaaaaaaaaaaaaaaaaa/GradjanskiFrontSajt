@@ -1,274 +1,158 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { ArrowRight, Users, MapPin, Calendar, ChevronDown, CheckCircle, AlertCircle } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Search, Calendar } from 'lucide-react'
+import BelgradeMap from '../components/map/BelgradeMap'
+import FirebaseService, { Assembly, localCommunities } from '../services/FirebaseService'
 
 function ZboroviPage() {
-  const [expandedFaq, setExpandedFaq] = useState<number | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedDate, setSelectedDate] = useState<string>('')
+  const [selectedCommunity, setSelectedCommunity] = useState<string | null>(null)
+  const [assemblies, setAssemblies] = useState<Assembly[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
-  const toggleFaq = (index: number) => {
-    setExpandedFaq(expandedFaq === index ? null : index)
+  useEffect(() => {
+    const fetchAssemblies = async () => {
+      try {
+        const data = await FirebaseService.getAssemblies()
+        setAssemblies(data)
+      } catch (err) {
+        setError('Greška prilikom učitavanja podataka o zborovima.')
+        console.error(err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchAssemblies()
+  }, [])
+
+  const handleMarkerClick = (localCommunityId: string) => {
+    setSelectedCommunity(localCommunityId)
   }
 
-  const faqs = [
-    {
-      question: 'Koliko ljudi je potrebno za zbor?',
-      answer: 'Ne postoji minimalan broj ljudi za zbor. Možeš početi i sa 5-10 ljudi iz tvog komšiluka ili zgrade. Važno je da počneš i da se glas širi!'
-    },
-    {
-      question: 'Gde mogu organizovati zbor?',
-      answer: 'Zbor možeš organizovati bilo gde: u parku, na trgu, u mesnoj zajednici, u dvorištu zgrade. Važno je da mesto bude pristupačno i da ima dovoljno prostora za sve učesnike.'
-    },
-    {
-      question: 'Kako da vodim zapisnik sa zbora?',
-      answer: 'Zapisnik treba da sadrži datum, vreme i mesto održavanja zbora, broj prisutnih, teme o kojima se razgovaralo i donete odluke. Možeš koristiti naš obrazac za zapisnik koji je dostupan na sajtu.'
-    },
-    {
-      question: 'Šta ako neko pokušava da ometa zbor?',
-      answer: 'Važno je unapred postaviti pravila diskusije. Ako neko ometa zbor, moderator treba ljubazno da ga podseti na pravila. Ako ometanje nastavi, možete zatražiti da napusti zbor. Uvek je dobro imati nekoliko ljudi zaduženih za održavanje reda.'
-    },
-    {
-      question: 'Da li odluke zbora moraju biti jednoglasne?',
-      answer: 'Idealno je težiti konsenzusu, ali to nije uvek moguće. Možete unapred dogovoriti način donošenja odluka - na primer, dvotrećinska većina za važne odluke. Važno je da proces bude transparentan i da svi učesnici razumeju kako se odluke donose.'
+  const handleRegisterAttendee = async (email: string, name: string, assemblyId: string) => {
+    try {
+      await FirebaseService.registerAttendee(email, name, assemblyId)
+      const updatedAssemblies = await FirebaseService.getAssemblies()
+      setAssemblies(updatedAssemblies)
+      setSuccessMessage('Uspešno ste se registrovali za zbor!')
+      setTimeout(() => setSuccessMessage(null), 3000)
+    } catch (err) {
+      throw err
     }
-  ]
+  }
+
+  const handleScheduleAssembly = async (
+    localCommunityId: string,
+    date: string,
+    time: string,
+    email: string,
+    name: string,
+    phone: string,
+    address: string,
+    description: string
+  ) => {
+    try {
+      const assembly = await FirebaseService.scheduleAssembly(
+        localCommunityId,
+        date,
+        time,
+        email,
+        name,
+        phone,
+        address,
+        description
+      )
+      setAssemblies(prev => [...prev, assembly])
+      setSuccessMessage('Uspešno ste zakazali zbor!')
+      setTimeout(() => setSuccessMessage(null), 3000)
+    } catch (err) {
+      throw err
+    }
+  }
 
   return (
-    <div className="bg-white">
-      {/* Hero Section */}
-      <section className="bg-primary py-16 text-white">
-        <div className="container mx-auto px-6">
+    <div className="pt-16">
+      <section className="bg-muted py-12">
+        <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-anton mb-6">
-              ZBOR JE OTVORENI SASTANAK GRAĐANA NA KOME SE KOLEKTIVNO DONOSE ODLUKE!
-            </h1>
-            <p className="text-xl mb-8 opacity-90">
-              <strong>Svako može sazvati Zbor</strong> – bez lidera, bez hijerarhije, bez skrivenih interesa. 
-              <strong> Mi sami odlučujemo o svojoj budućnosti!</strong>
+            <h1 className="text-3xl font-bold mb-4">Zborovi građana</h1>
+            <p className="text-lg text-muted-foreground mb-6">
+              Pronađite najbliže zborove u vašem okruženju ili pokrenite inicijativu za sazivanje zbora u vašoj mesnoj zajednici.
             </p>
-            <Link
-              to="#sazovi"
-              className="px-8 py-4 bg-white text-primary font-bold text-lg uppercase tracking-wider rounded-md hover:bg-white/90 transition-colors inline-flex items-center justify-center"
-            >
-              Sazovi Zbor SADA
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </div>
-        </div>
-      </section>
 
-      {/* What is Zbor Section */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-6">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-anton mb-8 text-center">
-              ŠTA JE ZBOR I ZAŠTO JE VAŽAN?
-            </h2>
+            <div className="flex flex-col md:flex-row gap-4 mb-6">
+              <div className="relative flex-grow">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Pretraži po mesnoj zajednici..."
+                  className="w-full pl-10 pr-4 py-3 rounded-md border border-input bg-background"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                <input
+                  type="date"
+                  className="w-full md:w-48 pl-10 pr-4 py-3 rounded-md border border-input bg-background"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-center gap-6 mb-4">
+              <div className="flex items-center">
+                <div className="h-6 w-6 rounded-full bg-red-500 mr-2"></div>
+                <span className="text-sm">Zbor nije zakazan</span>
+              </div>
+              <div className="flex items-center">
+                <div className="h-6 w-6 rounded-full bg-yellow-500 mr-2"></div>
+                <span className="text-sm">Zbor je zakazan (1-9 potpisa)</span>
+              </div>
+              <div className="flex items-center">
+                <div className="h-6 w-6 rounded-full bg-green-500 mr-2"></div>
+                <span className="text-sm">Zbor je potvrđen (10+ potpisa)</span>
+              </div>
+            </div>
             
-            <div className="bg-gray-50 p-8 rounded-lg border border-gray-100 mb-12">
-              <p className="text-lg mb-6">
-                <strong>Zborovi su ključni jer vraćaju moć narodu!</strong> Umesto da čekamo na institucije koje nas ignorišu, 
-                <strong> mi sami donosimo odluke i preuzimamo odgovornost za promene.</strong>
-              </p>
-              <p className="text-lg mb-6">
-                Zbor je demokratski alat koji omogućava građanima da se organizuju, diskutuju o problemima i zajedno donose odluke. 
-                To je prostor gde svaki glas ima jednaku težinu i gde se poštuje mišljenje svakog učesnika.
-              </p>
-              <p className="text-lg font-bold">
-                Kroz zborove gradimo zajednicu, solidarnost i snagu potrebnu za stvarne promene!
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-              <div className="bg-secondary text-white p-6 rounded-lg">
-                <h3 className="text-xl font-bold mb-4">✅ DIREKTNA DEMOKRATIJA</h3>
-                <p>
-                  Na zborovima građani direktno učestvuju u donošenju odluka, bez posrednika i političara.
-                </p>
+            {successMessage && (
+              <div className="mt-4 bg-green-100 border border-green-200 text-green-800 rounded-md p-4 animate-fade-in">
+                <p className="text-sm">{successMessage}</p>
               </div>
-              <div className="bg-secondary text-white p-6 rounded-lg">
-                <h3 className="text-xl font-bold mb-4">✅ TRANSPARENTNOST</h3>
-                <p>
-                  Sve odluke se donose javno, uz učešće svih prisutnih. Nema tajnih dogovora.
-                </p>
-              </div>
-              <div className="bg-secondary text-white p-6 rounded-lg">
-                <h3 className="text-xl font-bold mb-4">✅ GRAĐANSKA ODGOVORNOST</h3>
-                <p>
-                  Kroz zborove preuzimamo odgovornost za rešavanje problema u našoj zajednici.
-                </p>
-              </div>
-              <div className="bg-secondary text-white p-6 rounded-lg">
-                <h3 className="text-xl font-bold mb-4">✅ SOLIDARNOST</h3>
-                <p>
-                  Zborovi jačaju veze među građanima i grade osećaj zajedništva i međusobne podrške.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How to Organize Zbor Section */}
-      <section id="sazovi" className="py-16 bg-gray-50">
-        <div className="container mx-auto px-6">
-          <h2 className="text-3xl md:text-4xl font-anton mb-8 text-center">
-            KAKO SAZVATI ZBOR?
-          </h2>
-          
-          <div className="max-w-4xl mx-auto mb-12">
-            <div className="grid grid-cols-1 gap-6">
-              <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100">
-                <div className="p-6">
-                  <h3 className="text-2xl font-bold mb-6 text-primary">1. ODREDI TEMU I CILJ ZBORA</h3>
-                  <p className="text-lg mb-4">
-                    Da li je to organizacija protesta, rešavanje lokalnog problema ili planiranje sledeće akcije?
-                  </p>
-                  <ul className="space-y-2 mb-4">
-                    <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 text-primary mr-2 mt-1" />
-                      <span>Definiši jasan cilj zbora</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 text-primary mr-2 mt-1" />
-                      <span>Pripremi konkretna pitanja za diskusiju</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 text-primary mr-2 mt-1" />
-                      <span>Razmisli o mogućim rešenjima i predlozima</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100">
-                <div className="p-6">
-                  <h3 className="text-2xl font-bold mb-6 text-primary">2. OBAVESTI ZAJEDNICU</h3>
-                  <p className="text-lg mb-4">
-                    Objavi termin i mesto na društvenim mrežama i Telegram grupama.
-                  </p>
-                  <ul className="space-y-2 mb-4">
-                    <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 text-primary mr-2 mt-1" />
-                      <span>Koristi društvene mreže, Telegram grupe i lokalne oglasne table</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 text-primary mr-2 mt-1" />
-                      <span>Jasno navedi datum, vreme i mesto održavanja</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 text-primary mr-2 mt-1" />
-                      <span>Objasni temu i zašto je važno da ljudi prisustvuju</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100">
-                <div className="p-6">
-                  <h3 className="text-2xl font-bold mb-6 text-primary">3. POSTAVI PRAVILA DISKUSIJE</h3>
-                  <p className="text-lg mb-4">
-                    Svako ima pravo da govori, odluke se donose konsenzusom.
-                  </p>
-                  <ul className="space-y-2 mb-4">
-                    <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 text-primary mr-2 mt-1" />
-                      <span>Ograniči vreme izlaganja (npr. 2-3 minuta po osobi)</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 text-primary mr-2 mt-1" />
-                      <span>Dogovori način donošenja odluka (konsenzus ili glasanje)</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 text-primary mr-2 mt-1" />
-                      <span>Insistiraj na međusobnom poštovanju i konstruktivnoj diskusiji</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100">
-                <div className="p-6">
-                  <h3 className="text-2xl font-bold mb-6 text-primary">4. OBEZBEDI MODERACIJU</h3>
-                  <p className="text-lg mb-4">
-                    Kako bi se rasprava vodila konstruktivno i bez ometanja.
-                  </p>
-                  <ul className="space-y-2 mb-4">
-                    <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 text-primary mr-2 mt-1" />
-                      <span>Odredi moderatora koji će voditi diskusiju</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 text-primary mr-2 mt-1" />
-                      <span>Zaduži nekoga da vodi zapisnik</span>
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="h-5 w-5 text-primary mr-2 mt-1" />
-                      <span>Obezbedi da se donete odluke jasno formulišu i zapišu</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Call to Action Section */}
-      <section className="py-16 bg-primary text-white">
-        <div className="container mx-auto px-6">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-anton mb-8">
-              NE ČEKAJ! SAZOVI ZBOR I POKRENI PROMENU!
-            </h2>
+            )}
             
-            <div className="bg-secondary p-8 rounded-lg mb-12">
-              <h3 className="text-2xl font-bold mb-4">AKO VIDIŠ PROBLEM U SVOJOJ ZAJEDNICI, PREUZMI INICIJATIVU!</h3>
-              <p className="text-lg mb-6">
-                <strong>Mi sami moramo biti promena koju želimo da vidimo.</strong> Kroz zborove gradimo snagu i solidarnost potrebnu za stvarne promene!
-              </p>
-              <button className="px-8 py-4 bg-white text-primary font-bold text-lg uppercase tracking-wider rounded-md hover:bg-white/90 transition-colors inline-flex items-center justify-center">
-                Sazovi Zbor SADA
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </button>
-            </div>
+            {error && (
+              <div className="mt-4 bg-destructive/10 border border-destructive/20 text-destructive rounded-md p-4 animate-fade-in">
+                <p className="text-sm">{error}</p>
+              </div>
+            )}
           </div>
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-6">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-anton mb-8 text-center">
-              ČESTO POSTAVLJANA PITANJA O ZBOROVIMA
-            </h2>
-
-            <div className="bg-white rounded-lg shadow-md p-6 border border-gray-100">
-              {faqs.map((faq, index) => (
-                <div
-                  key={index}
-                  className="border-b border-gray-100 last:border-0 py-5"
-                >
-                  <button
-                    onClick={() => toggleFaq(index)}
-                    className="flex justify-between items-center w-full text-left"
-                  >
-                    <h3 className="text-lg font-bold">{faq.question}</h3>
-                    <ChevronDown
-                      className={`h-5 w-5 text-foreground/60 transition-transform ${
-                        expandedFaq === index ? 'rotate-180' : ''
-                      }`}
-                    />
-                  </button>
-                  {expandedFaq === index && (
-                    <div className="mt-4 text-foreground/80">
-                      <p>{faq.answer}</p>
-                    </div>
-                  )}
-                </div>
-              ))}
+      <section className="py-8">
+        <div className="container mx-auto px-4">
+          {loading ? (
+            <div className="flex items-center justify-center h-[600px]">
+              <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+              <span className="ml-3 text-muted-foreground">Učitavanje mape...</span>
             </div>
-          </div>
+          ) : (
+            <div className="h-[700px] relative bg-muted rounded-lg overflow-hidden">
+              <BelgradeMap 
+                assemblies={assemblies}
+                onMarkerClick={handleMarkerClick}
+                selectedCommunity={selectedCommunity}
+                onScheduleAssembly={handleScheduleAssembly}
+                onRegisterAttendee={handleRegisterAttendee}
+              />
+            </div>
+          )}
         </div>
       </section>
     </div>

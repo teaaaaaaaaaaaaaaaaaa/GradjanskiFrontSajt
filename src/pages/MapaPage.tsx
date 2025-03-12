@@ -138,68 +138,86 @@ function MapaPage() {
   }
 
   // Handle scheduling an assembly
-  const handleScheduleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleScheduleSubmit = async (
+    localCommunityId: string,
+    date: string,
+    time: string,
+    email: string,
+    name: string,
+    phone: string,
+    address: string,
+    description: string
+  ) => {
+    try {
+      await FirebaseService.scheduleAssembly(
+        localCommunityId,
+        date,
+        time,
+        email,
+        name,
+        phone,
+        address,
+        description
+      );
+      const updatedAssemblies = await FirebaseService.getAssemblies();
+      setAssemblies(updatedAssemblies);
+      setSuccessMessage('Uspešno ste zakazali zbor!');
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  // Handle form submission
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!calendarOpen || isSubmitting) return;
     
-    if (!calendarOpen || isSubmitting) return
+    setFormError(null);
     
-    // Reset form error
-    setFormError(null)
-    
-    // Validate form
     if (!userEmail || !userName || !scheduleDatetime.date || !scheduleDatetime.time || !userPhone) {
-      setFormError('Molimo popunite sva obavezna polja.')
-      return
+      setFormError('Molimo popunite sva obavezna polja.');
+      return;
     }
     
-    // Check if user is from the community
     if (!isFromCommunity) {
-      setFormError('Samo stanovnici mesne zajednice mogu zakazati zbor. Molimo potvrdite da ste stanovnik ove mesne zajednice.')
-      return
+      setFormError('Samo stanovnici mesne zajednice mogu zakazati zbor. Molimo potvrdite da ste stanovnik ove mesne zajednice.');
+      return;
     }
     
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(userEmail)) {
-      setFormError('Molimo unesite validnu email adresu.')
-      return
+      setFormError('Molimo unesite validnu email adresu.');
+      return;
     }
     
-    // Phone validation - simple check for now
     if (userPhone.length < 6) {
-      setFormError('Molimo unesite validan broj telefona.')
-      return
+      setFormError('Molimo unesite validan broj telefona.');
+      return;
     }
     
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     
     try {
-      // Get community info
-      const community = localCommunities.find(c => c.id === calendarOpen)
+      const community = localCommunities.find(c => c.id === calendarOpen);
       if (!community) {
-        setFormError('Mesna zajednica nije pronađena.')
-        setIsSubmitting(false)
-        return
+        setFormError('Mesna zajednica nije pronađena.');
+        return;
       }
       
-      // Check if assembly already exists
-      const existingAssembly = assemblies.find(a => a.localCommunityId === calendarOpen)
+      const existingAssembly = assemblies.find(a => a.localCommunityId === calendarOpen);
       if (existingAssembly) {
-        setFormError(`Zbor je već zakazan za mesnu zajednicu ${community.name}.`)
-        setIsSubmitting(false)
-        return
+        setFormError(`Zbor je već zakazan za mesnu zajednicu ${community.name}.`);
+        return;
       }
       
-      // Check if email already used for scheduling any assembly
-      const isEmailUsed = await FirebaseService.isEmailUsedForScheduling(userEmail)
+      const isEmailUsed = await FirebaseService.isEmailUsedForScheduling(userEmail);
       if (isEmailUsed) {
-        setFormError('Već ste zakazali zbor sa ovom email adresom.')
-        setIsSubmitting(false)
-        return
+        setFormError('Već ste zakazali zbor sa ovom email adresom.');
+        return;
       }
       
-      // Schedule the assembly
-      const assembly = await FirebaseService.scheduleAssembly(
+      await handleScheduleSubmit(
         calendarOpen,
         scheduleDatetime.date,
         scheduleDatetime.time,
@@ -208,23 +226,15 @@ function MapaPage() {
         userPhone,
         `${community.name}, Beograd`,
         `Zbor građana mesne zajednice ${community.name}`
-      )
+      );
       
-      // Update assemblies list
-      setAssemblies(prev => [...prev, assembly])
-      
-      // Close the form
-      setCalendarOpen(null)
-      
-      // Show success message
-      setSuccessMessage('Uspešno ste zakazali zbor!')
-      setTimeout(() => setSuccessMessage(null), 3000)
+      setCalendarOpen(null);
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Došlo je do greške prilikom zakazivanja zbora.')
+      setFormError(err instanceof Error ? err.message : 'Došlo je do greške prilikom zakazivanja zbora.');
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   // Filter communities based on search term
   const filteredCommunities = localCommunities.filter(community => {
@@ -298,8 +308,8 @@ function MapaPage() {
                 assemblies={assemblies}
                 onMarkerClick={handleMarkerClick}
                 selectedCommunity={selectedCommunity}
-                onScheduleClick={handleOpenScheduleForm}
-                onRegisterClick={handleRegisterAttendee}
+                onScheduleAssembly={handleScheduleSubmit}
+                onRegisterAttendee={handleRegisterAttendee}
               />
 
               {/* Map Legend */}
@@ -433,7 +443,7 @@ function MapaPage() {
               </button>
             </div>
             <div className="calendar-popup-body">
-              <form onSubmit={handleScheduleSubmit}>
+              <form onSubmit={handleFormSubmit}>
                 {formError && (
                   <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 text-destructive rounded-md flex items-start">
                     <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />

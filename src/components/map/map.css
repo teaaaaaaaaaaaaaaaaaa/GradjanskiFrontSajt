@@ -24,19 +24,19 @@
   border-radius: 50%;
 }
 
-.never-scheduled {
-  color: #e63946; /* Red */
-  background-color: #e63946;
+.never-scheduled .marker-pin {
+  background-color: #ef4444; /* red-500 */
+  color: #ef4444;
 }
 
-.scheduled {
-  color: #ffb703; /* Yellow */
-  background-color: #ffb703;
+.scheduled .marker-pin {
+  background-color: #eab308; /* yellow-500 */
+  color: #eab308;
 }
 
-.confirmed {
-  color: #2a9d8f; /* Green */
-  background-color: #2a9d8f;
+.confirmed .marker-pin {
+  background-color: #22c55e; /* green-500 */
+  color: #22c55e;
 }
 
 .leaflet-container {
@@ -327,19 +327,15 @@
 }
 
 .popup-button.schedule {
-  background-color: #e63946;
+  background-color: #ef4444;
   color: white;
 }
 
 .popup-button.schedule:hover {
-  background-color: #c81d2a;
+  background-color: #dc2626;
 }
 
 .popup-button.register {
   background-color: #ffb703;
   color: #111827;
-}
-
-.popup-button.register:hover {
-  background-color: #e6a503;
 } 

@@ -1,30 +1,36 @@
 import { useState } from 'react';
-import { localCommunities } from '../../services/FirebaseService';
+import FirebaseService, { localCommunities } from '../../services/FirebaseService';
+import { X } from 'lucide-react';
+
+interface InitiativeFormData {
+  localCommunityId: string;
+  localCommunityName: string;
+  address: string;
+  description: string;
+  contactPhone: string;
+  scheduleNow: boolean;
+  date: string;
+  time: string;
+  email: string;
+  name: string;
+  isResident: boolean;
+}
 
 interface InitiativeFormProps {
   localCommunityId: string;
-  onSubmit: (data: {
-    localCommunityId: string;
-    localCommunityName: string;
-    address: string;
-    description: string;
-    contactPhone: string;
-    scheduleNow: boolean;
-    date: string;
-    time: string;
-  }) => Promise<void>;
+  onSubmit: (data: InitiativeFormData) => Promise<void>;
+  onClose?: () => void;
 }
 
-const InitiativeForm = ({ localCommunityId, onSubmit }: InitiativeFormProps) => {
-  const [address, setAddress] = useState('');
-  const [description, setDescription] = useState('');
-  const [contactPhone, setContactPhone] = useState('');
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
+const InitiativeForm = ({ localCommunityId, onSubmit, onClose }: InitiativeFormProps) => {
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  const [isResident, setIsResident] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [scheduleNow, setScheduleNow] = useState(false);
+  const [status, setStatus] = useState<{ type: 'error' | 'success' | null; message: string | null }>({
+    type: null,
+    message: null
+  });
 
   const community = localCommunities.find(c => c.id === localCommunityId);
 
@@ -32,201 +38,153 @@ const InitiativeForm = ({ localCommunityId, onSubmit }: InitiativeFormProps) => 
     e.preventDefault();
     
     if (!community) {
-      setError('Mesna zajednica nije pronađena.');
+      setStatus({ type: 'error', message: 'Mesna zajednica nije pronađena.' });
       return;
     }
     
-    if (!address.trim()) {
-      setError('Unesite adresu održavanja zbora.');
+    if (!isResident) {
+      setStatus({ type: 'error', message: 'Morate potvrditi da ste stanovnik ove mesne zajednice.' });
       return;
     }
-    
-    if (!description.trim()) {
-      setError('Unesite opis inicijative.');
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setStatus({ type: 'error', message: 'Molimo unesite ispravnu email adresu.' });
       return;
-    }
-    
-    if (!contactPhone.trim()) {
-      setError('Unesite kontakt telefon.');
-      return;
-    }
-    
-    if (scheduleNow) {
-      if (!date.trim()) {
-        setError('Unesite datum održavanja zbora.');
-        return;
-      }
-      
-      if (!time.trim()) {
-        setError('Unesite vreme održavanja zbora.');
-        return;
-      }
     }
     
     setIsSubmitting(true);
-    setError(null);
-    setSuccess(null);
+    setStatus({ type: null, message: null });
     
     try {
+      const isDuplicateEmail = await FirebaseService.isEmailRegistered(email, community.name);
+      if (isDuplicateEmail) {
+        setStatus({ type: 'error', message: 'Već ste registrovani sa ovom email adresom.' });
+        setIsSubmitting(false);
+        return;
+      }
+
       await onSubmit({
         localCommunityId,
         localCommunityName: community.name,
-        address,
-        description,
-        contactPhone,
-        scheduleNow,
-        date,
-        time,
+        address: community.address,
+        description: '',
+        contactPhone: '',
+        scheduleNow: false,
+        date: '',
+        time: '',
+        email,
+        name,
+        isResident
       });
       
-      setSuccess('Uspešno ste pokrenuli inicijativu za sazivanje zbora!');
+      setStatus({ type: 'success', message: 'Uspešno ste se prijavili!' });
+      setEmail('');
+      setName('');
+      setIsResident(false);
       
-      // Reset form
-      setAddress('');
-      setDescription('');
-      setContactPhone('');
-      setDate('');
-      setTime('');
-      setScheduleNow(false);
+      // Automatically close form after success
+      setTimeout(() => {
+        onClose?.();
+      }, 2000);
+      
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Došlo je do greške prilikom pokretanja inicijative.');
+      setStatus({ 
+        type: 'error', 
+        message: err instanceof Error ? err.message : 'Došlo je do greške prilikom prijave.' 
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="p-4 border border-border rounded-lg bg-card">
-      <h3 className="text-lg font-medium mb-2">Inicijativa za sazivanje zbora</h3>
+    <div className="bg-white rounded-lg shadow-lg max-w-md w-full mx-auto p-6" style={{ maxHeight: '100vh' }}>
+      {status.message && (
+        <div className={`mb-6 p-3 rounded-md text-sm ${
+          status.type === 'error' 
+            ? 'bg-red-50 border border-red-200 text-red-700' 
+            : 'bg-green-50 border border-green-200 text-green-700'
+        }`}>
+          {status.message}
+        </div>
+      )}
+      
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-xl font-semibold text-gray-800">Prijava za zbor</h3>
+        {onClose && (
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+            <X size={20} />
+          </button>
+        )}
+      </div>
       
       <div className="mb-4">
-        <p className="text-sm text-muted-foreground">
-          <strong>Mesna zajednica:</strong> {community?.name || 'Nepoznata mesna zajednica'}
+        <p className="text-sm text-gray-600">
+          <strong>Mesna zajednica:</strong> {community?.name}
+        </p>
+        <p className="text-sm text-gray-600">
+          <strong>Adresa:</strong> {community?.address}
         </p>
       </div>
       
-      {error && (
-        <div className="bg-destructive/10 border border-destructive/20 text-destructive rounded-md p-3 mb-4">
-          {error}
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+            Ime i prezime *
+          </label>
+          <input
+            type="text"
+            id="name"
+            className="w-full px-3 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
         </div>
-      )}
-      
-      {success && (
-        <div className="bg-green-100 border border-green-200 text-green-800 rounded-md p-3 mb-4">
-          {success}
+        
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            Email adresa *
+          </label>
+          <input
+            type="email"
+            id="email"
+            className="w-full px-3 py-2 rounded-md border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
         </div>
-      )}
-      
-      <form onSubmit={handleSubmit}>
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="address" className="block text-sm font-medium mb-1">
-              Adresa održavanja zbora
-            </label>
-            <input
-              type="text"
-              id="address"
-              className="w-full px-3 py-2 rounded-md border border-input bg-background"
-              placeholder="Npr. Ulica Slobode 1, Beograd"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              required
-            />
-          </div>
-          
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium mb-1">
-              Opis inicijative
-            </label>
-            <textarea
-              id="description"
-              className="w-full px-3 py-2 rounded-md border border-input bg-background min-h-[100px]"
-              placeholder="Opišite razlog za sazivanje zbora..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-            />
-          </div>
-          
-          <div>
-            <label htmlFor="contactPhone" className="block text-sm font-medium mb-1">
-              Kontakt telefon
-            </label>
-            <input
-              type="tel"
-              id="contactPhone"
-              className="w-full px-3 py-2 rounded-md border border-input bg-background"
-              placeholder="Npr. +381 11 123 4567"
-              value={contactPhone}
-              onChange={(e) => setContactPhone(e.target.value)}
-              required
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              Ovaj broj će biti dostupan zainteresovanim građanima.
-            </p>
-          </div>
-          
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="scheduleNow"
-              className="mr-2"
-              checked={scheduleNow}
-              onChange={(e) => setScheduleNow(e.target.checked)}
-            />
-            <label htmlFor="scheduleNow" className="text-sm font-medium">
-              Odmah zakaži zbor
-            </label>
-          </div>
-          
-          {scheduleNow && (
-            <div className="space-y-4 p-3 bg-muted rounded-md">
-              <div>
-                <label htmlFor="date" className="block text-sm font-medium mb-1">
-                  Datum zbora
-                </label>
-                <input
-                  type="date"
-                  id="date"
-                  className="w-full px-3 py-2 rounded-md border border-input bg-background"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  min={new Date().toISOString().split('T')[0]}
-                  required={scheduleNow}
-                />
-              </div>
-              
-              <div>
-                <label htmlFor="time" className="block text-sm font-medium mb-1">
-                  Vreme zbora
-                </label>
-                <input
-                  type="time"
-                  id="time"
-                  className="w-full px-3 py-2 rounded-md border border-input bg-background"
-                  value={time}
-                  onChange={(e) => setTime(e.target.value)}
-                  required={scheduleNow}
-                />
-              </div>
+        
+        <div className="flex items-start">
+          <input
+            type="checkbox"
+            id="isResident"
+            className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            checked={isResident}
+            onChange={(e) => setIsResident(e.target.checked)}
+            required
+          />
+          <label htmlFor="isResident" className="ml-2 block text-sm text-gray-600">
+            Potvrđujem da sam stanovnik ove mesne zajednice *
+          </label>
+        </div>
+        
+        <button
+          type="submit"
+          className="w-full px-4 py-2 bg-red-600 text-white rounded-md font-medium hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <div className="flex items-center justify-center">
+              <span className="mr-2">Prijava u toku...</span>
+              <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
             </div>
+          ) : (
+            'Prijavi se'
           )}
-          
-          <button
-            type="submit"
-            className="w-full px-4 py-2 bg-red-600 text-white rounded-md font-medium hover:bg-red-700 transition-colors flex items-center justify-center"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <>
-                <span className="mr-2">Slanje inicijative...</span>
-                <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              </>
-            ) : (
-              scheduleNow ? 'Zakaži zbor' : 'Pokreni inicijativu'
-            )}
-          </button>
-        </div>
+        </button>
       </form>
     </div>
   );
