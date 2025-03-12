@@ -23,7 +23,7 @@ function App() {
       <Router>
         <div className="flex flex-col min-h-screen bg-white">
           <Navbar />
-          <main className="flex-grow pt-24 md:pt-36">
+          <main className="flex-grow">
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/radne-grupe" element={<RadneGrupe />} />

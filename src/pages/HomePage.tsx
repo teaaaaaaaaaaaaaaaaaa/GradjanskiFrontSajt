@@ -67,14 +67,29 @@ function HomePage() {
   return (
     <div className="pt-0 bg-white">
       {/* Hero Section */}
-      <section className="relative bg-white py-0 md:py-0 mb-12">
-        <div className="container mx-auto px-6">
+      <section className="relative py-0 md:py-0 mb-12 h-screen">
+        {/* Video Background */}
+        <div className="absolute inset-0 w-full h-full overflow-hidden">
+          <video 
+            className="w-full h-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+          >
+            <source src="/videohome.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+          <div className="absolute inset-0 bg-black/50"></div>
+        </div>
+        
+        <div className="container relative z-10 mx-auto px-6 h-full flex flex-col justify-center">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-            <div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-anton mb-6 leading-tight">
+            <div className="max-w-3xl">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-anton mb-6 leading-tight text-white">
                 ORGANIZUJMO SE ZA <span className="text-primary">BOLJU BUDUĆNOST</span>
               </h1>
-              <p className="text-lg md:text-xl text-foreground/80 mb-8 max-w-lg">
+              <p className="text-lg md:text-xl text-white mb-8 max-w-lg">
                 Građanski front je platforma za organizovanje građana kroz radne grupe i
                 zborove. Pridružite se i budite deo promene.
               </p>
@@ -94,11 +109,11 @@ function HomePage() {
                 </Link>
               </div>
             </div>
-            <div className="relative flex justify-center lg:justify-end">
-              <img
-                src="/budinafrontu.png"
-                alt="Budi i ti na frontu"
-                className="w-auto h-auto max-h-[650px] object-contain"
+            <div className="hidden lg:flex justify-start lg:justify-center">
+              <img 
+                src="/9__1_-removebg-preview.png" 
+                alt="Budi i ti na frontu" 
+                className="max-h-[700px] object-contain z-10"
               />
             </div>
           </div>
