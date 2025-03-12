@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Users, MapPin, Calendar, Bell, ChevronDown } from 'lucide-react'
+import { ArrowRight, Users, MapPin, Calendar, Bell, ChevronDown, BarChart, Briefcase, Shield, MessageCircle } from 'lucide-react'
+import ExpandingCard from '../components/ExpandingCard'
 
 function HomePage() {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null)
@@ -67,35 +68,36 @@ function HomePage() {
   return (
     <div className="pt-0 bg-white">
       {/* Hero Section */}
-      <section className="relative py-0 md:py-0 mb-12 h-screen">
+      <section className="relative min-h-screen flex items-center">
         {/* Video Background */}
-        <div className="absolute inset-0 w-full h-full overflow-hidden">
-          <video 
-            className="w-full h-full object-cover"
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <div className="absolute inset-0 bg-black opacity-50 z-10"></div>
+          <video
             autoPlay
-            muted
             loop
+            muted
             playsInline
+            className="w-full h-full object-cover"
           >
             <source src="/videohome.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
-          <div className="absolute inset-0 bg-black/50"></div>
         </div>
-        
-        <div className="container relative z-10 mx-auto px-6 h-full flex flex-col justify-center">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-            <div className="max-w-3xl">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-anton mb-6 leading-tight text-white">
-                ORGANIZUJMO SE ZA <span className="text-primary">BOLJU BUDUĆNOST</span>
+
+        {/* Content */}
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mx-auto max-w-[80%]">
+            <div className="text-left lg:pl-[20%]">
+              <h1 className="text-4xl md:text-5xl lg:text-7xl font-anton mb-6 leading-tight text-white">
+                <span className="text-primary">ŽELITE DA POMOGNETE</span> STUDENTIMA?
               </h1>
-              <p className="text-lg md:text-xl text-white mb-8 max-w-lg">
-                Građanski front je platforma za organizovanje građana kroz radne grupe i
-                zborove. Pridružite se i budite deo promene.
+              <p className="text-lg md:text-xl lg:text-2xl mb-8 text-white max-w-xl">
+                Zajedno možemo stvoriti <br />promene koje su nam potrebne.<br />
+                <strong>Vaš glas i angažman su ključni za izgradnju društva kakvo zaslužujemo.</strong>
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
-                  to="/register"
+                  to="/radne-grupe#grupe-lista"
                   className="gf-button gf-button-primary rounded-md flex items-center justify-center"
                 >
                   Pridruži se
@@ -109,11 +111,12 @@ function HomePage() {
                 </Link>
               </div>
             </div>
-            <div className="hidden lg:flex justify-start lg:justify-center">
+            <div className="hidden lg:flex justify-center items-center relative">
               <img 
                 src="/9__1_-removebg-preview.png" 
                 alt="Budi i ti na frontu" 
-                className="max-h-[700px] object-contain z-10"
+                className="transform scale-125 absolute right-0 h-auto w-auto object-contain z-10"
+                style={{ maxWidth: "130%" }}
               />
             </div>
           </div>
@@ -124,7 +127,7 @@ function HomePage() {
       <section className="py-16 bg-white border-t border-b border-gray-100">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-anton mb-4">KAKO FUNKCIONIŠE GRAĐANSKI FRONT?</h2>
+            <h2 className="text-3xl md:text-4xl font-anton mb-4 text-primary">KAKO FUNKCIONIŠE GRAĐANSKI FRONT?</h2>
             <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
               Naša platforma omogućava građanima da se organizuju, povezuju i aktivno učestvuju u
               društvenim promenama.
@@ -132,23 +135,158 @@ function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-100"
-              >
-                <div className="bg-primary/10 p-3 rounded-full inline-block mb-4">{feature.icon}</div>
-                <h3 className="text-xl font-bold uppercase mb-2">{feature.title}</h3>
-                <p className="text-foreground/80 mb-4">{feature.description}</p>
-                <Link
-                  to={feature.link}
-                  className="text-primary font-medium inline-flex items-center hover:underline"
-                >
-                  Saznaj više
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
+            {/* Feature 1 */}
+            <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100 transition-all hover:shadow-md">
+              <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                <Users className="h-6 w-6 text-primary" />
               </div>
-            ))}
+              <h3 className="text-lg font-bold mb-2">Povezivanje</h3>
+              <p className="text-foreground/70">
+                Povežite se sa drugim građanima koji dele vaše vrednosti i interese za promene u društvu.
+              </p>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100 transition-all hover:shadow-md">
+              <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                <BarChart className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="text-lg font-bold mb-2">Radne grupe</h3>
+              <p className="text-foreground/70">
+                Pridružite se ili formirajte radne grupe koje se bave specifičnim društvenim pitanjima.
+              </p>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100 transition-all hover:shadow-md">
+              <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                <MapPin className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="text-lg font-bold mb-2">Zborovi</h3>
+              <p className="text-foreground/70">
+                Učestvujte na lokalnim zborovima gde građani zajednički odlučuju o važnim pitanjima u svojoj zajednici.
+              </p>
+            </div>
+
+            {/* Feature 4 */}
+            <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100 transition-all hover:shadow-md">
+              <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                <Calendar className="h-6 w-6 text-primary" />
+              </div>
+              <h3 className="text-lg font-bold mb-2">Akcije</h3>
+              <p className="text-foreground/70">
+                Organizujte i učestvujte u konkretnim akcijama koje donose pozitivne promene u društvu.
+              </p>
+            </div>
+          </div>
+          
+          {/* Questions and Answers Section */}
+          <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-10">
+            {/* Question 1 */}
+            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-100 transition-all hover:shadow-md">
+              <h3 className="text-2xl font-bold mb-4 text-primary">Šta je građanski front?</h3>
+              <p className="text-foreground/80 text-lg leading-relaxed">
+                Platforma koja omogućava građanima da se organizuju, povezuju i aktivno učestvuju u društvenim promenama. 
+                Kroz saradnju i zajedničku akciju, stvaramo prostor za aktivno učešće svih koji žele da utiču na bolje sutra.
+              </p>
+            </div>
+            
+            {/* Question 2 */}
+            <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-100 transition-all hover:shadow-md">
+              <h3 className="text-2xl font-bold mb-4 text-primary">Zašto baš građanski front?</h3>
+              <p className="text-foreground/80 text-lg leading-relaxed">
+                Građanski front postoji jer samo zajedno možemo stvoriti društvo koje zaslužujemo. 
+                Podrška studentima nije samo čin solidarnosti, već korak ka pravednijoj budućnosti za sve. 
+                Zajedno ne čekamo promene – mi ih stvaramo!
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Građanske Radne Grupe Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-anton mb-4 text-primary">GRAĐANSKE RADNE GRUPE</h2>
+            <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
+              Pridružite se nekoj od naših radnih grupa i doprinesite svojim znanjem i iskustvom.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* GRG za logistiku */}
+            <Link to="/radne-grupe/logistika" className="block">
+              <ExpandingCard 
+                title="GRG za logistiku i donacije (GRGL)"
+                description="Brine o nabavci hrane, vode, medicinske pomoći i ostalih resursa potrebnih za proteste i blokade."
+                image="/logistika.jpg"
+                icon={<Briefcase className="h-8 w-8" />}
+                footer={
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-500">
+                      <Users className="inline-block mr-1 h-4 w-4" />
+                      42 članova
+                    </span>
+                    <span className="text-primary font-medium text-sm flex items-center group-hover:translate-x-1 transition-transform">
+                      Saznaj više
+                      <ArrowRight className="ml-1 h-4 w-4" />
+                    </span>
+                  </div>
+                }
+              />
+            </Link>
+
+            {/* GRG za bezbednost */}
+            <Link to="/radne-grupe/bezbednost" className="block">
+              <ExpandingCard 
+                title="GRG za bezbednost (GRGB)"
+                description="Organizuje redarske službe, pruža podršku učesnicima protesta i sprečava provokacije."
+                image="/bezbednost.jpg"
+                icon={<Shield className="h-8 w-8" />}
+                footer={
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-500">
+                      <Users className="inline-block mr-1 h-4 w-4" />
+                      38 članova
+                    </span>
+                    <span className="text-primary font-medium text-sm flex items-center group-hover:translate-x-1 transition-transform">
+                      Saznaj više
+                      <ArrowRight className="ml-1 h-4 w-4" />
+                    </span>
+                  </div>
+                }
+              />
+            </Link>
+
+            {/* GRG za komunikaciju */}
+            <Link to="/radne-grupe/komunikacija" className="block">
+              <ExpandingCard 
+                title="GRG za komunikaciju (GRGK)"
+                description="Obezbeđuje pravovremene informacije za sve učesnike protesta, održava Telegram grupe i pomaže u koordinaciji akcija."
+                image="/komunikacije.jpg"
+                icon={<MessageCircle className="h-8 w-8" />}
+                footer={
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-500">
+                      <Users className="inline-block mr-1 h-4 w-4" />
+                      56 članova
+                    </span>
+                    <span className="text-primary font-medium text-sm flex items-center group-hover:translate-x-1 transition-transform">
+                      Saznaj više
+                      <ArrowRight className="ml-1 h-4 w-4" />
+                    </span>
+                  </div>
+                }
+              />
+            </Link>
+          </div>
+
+          <div className="text-center mt-10">
+            <Link to="/radne-grupe" className="inline-flex items-center justify-center px-6 py-3 bg-primary text-white font-medium rounded-md hover:bg-primary-dark transition-colors">
+              VIDI SVE RADNE GRUPE
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
           </div>
         </div>
       </section>
@@ -198,26 +336,20 @@ function HomePage() {
       <section className="py-16 bg-primary text-white">
         <div className="container mx-auto px-6 text-center">
           <img 
-            src="/logopomogni.png" 
+            src="/crven.png" 
             alt="Pomogni Građanskom Frontu" 
             className="h-48 mx-auto mb-6"
           />
           <h2 className="text-3xl md:text-4xl font-anton mb-6">SPREMNI DA SE PRIDRUŽITE?</h2>
           <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto opacity-90">
-            Registrujte se danas i postanite deo Građanskog fronta. Zajedno možemo napraviti promenu.
+            Popunite formular za prijavu i postanite deo Građanskog fronta. Zajedno možemo napraviti promenu.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex justify-center">
             <Link
-              to="/register"
-              className="px-6 py-3 bg-white text-primary font-bold uppercase tracking-wider rounded-md hover:bg-white/90 transition-colors inline-flex items-center justify-center"
+              to="/obavesti-me"
+              className="px-8 py-4 bg-white text-primary font-bold text-lg uppercase tracking-wider rounded-md hover:bg-white/90 transition-colors inline-flex items-center justify-center"
             >
-              Registruj se
-            </Link>
-            <Link
-              to="/radne-grupe"
-              className="px-6 py-3 bg-white/10 text-white border border-white/20 font-bold uppercase tracking-wider rounded-md hover:bg-white/20 transition-colors inline-flex items-center justify-center"
-            >
-              Istraži radne grupe
+              Obavesti me
             </Link>
           </div>
         </div>
