@@ -7,8 +7,6 @@ function Footer() {
   const socialLinks = [
     { icon: <Facebook size={20} />, url: 'https://facebook.com', label: 'Facebook' },
     { icon: <Twitter size={20} />, url: 'https://twitter.com', label: 'Twitter' },
-    { icon: <Instagram size={20} />, url: 'https://instagram.com', label: 'Instagram' },
-    { icon: <Youtube size={20} />, url: 'https://youtube.com', label: 'YouTube' },
   ]
 
   return (
@@ -46,11 +44,6 @@ function Footer() {
               <li>
                 <Link to="/radne-grupe" className="text-white/70 hover:text-white transition-colors text-sm flex items-center">
                   <span className="w-5">•</span> Radne grupe
-                </Link>
-              </li>
-              <li>
-                <Link to="/mapa" className="text-white/70 hover:text-white transition-colors text-sm flex items-center">
-                  <span className="w-5">•</span> Mapa
                 </Link>
               </li>
               <li>

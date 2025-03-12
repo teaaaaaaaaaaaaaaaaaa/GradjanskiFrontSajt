@@ -107,7 +107,7 @@ function ZboroviPage() {
       {/* Naslov i prvi deo - poravnat levo */}
       <section className="w-full px-4 py-12">
         <div className="text-left">
-          <h1 className="text-4xl md:text-5xl font-bold mb-8 text-red-700">ZBOR GRAĐANA – TVOJ GLAS, TVOJA ZAJEDNICA!</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-8 mt-8 text-red-700">ZBOR GRAĐANA – TVOJ GLAS, TVOJA ZAJEDNICA!</h1>
 
           <p className="text-xl font-bold mb-6">
             Naša platforma omogućava građanima da se organizuju, povezuju i aktivno učestvuju u društvenim promenama
@@ -157,8 +157,8 @@ function ZboroviPage() {
           <div className="border-2 border-red-700 bg-red-700 text-white rounded-none flex flex-col items-center w-full md:w-1/3 max-w-md">
             <div className="text-6xl md:text-8xl font-bold my-6 md:my-8">1</div>
             <div className="p-6 md:p-8 pt-0">
-              <h3 className="text-xl md:text-2xl font-bold mb-4 text-center">Klikni na dugme "Pridruži se"</h3>
-              <p className="text-center text-base md:text-lg">Odaberi radnu grupu koja odgovara tvojim interesima i veštinama</p>
+              <h3 className="text-xl md:text-2xl font-bold mb-4 text-center">Pronađite svoju mesnu zajednicu</h3>
+              <p className="text-center text-base md:text-lg">Koristite mapu da pronađete vašu mesnu zajednicu i saznate da li se u njoj organizuje zbor građana.</p>
             </div>
           </div>
 
@@ -166,8 +166,8 @@ function ZboroviPage() {
           <div className="border-2 border-red-700 bg-red-700 text-white rounded-none flex flex-col items-center w-full md:w-1/3 max-w-md">
             <div className="text-6xl md:text-8xl font-bold my-6 md:my-8">2</div>
             <div className="p-6 md:p-8 pt-0">
-              <h3 className="text-xl md:text-2xl font-bold mb-4 text-center">Uđi u Telegram grupu izabrane GRG</h3>
-              <p className="text-center text-base md:text-lg">Dobićeš link za pristup Telegram grupi gde se odvija komunikacija</p>
+              <h3 className="text-xl md:text-2xl font-bold mb-4 text-center">Iniciranje zbora građana</h3>
+              <p className="text-center text-base md:text-lg">Ako u vašoj zajednici još uvek nije zakazan zbor, možete biti prvi koji će ga inicirati klikom na marker na mapi.</p>
             </div>
           </div>
 
@@ -175,25 +175,17 @@ function ZboroviPage() {
           <div className="border-2 border-red-700 bg-red-700 text-white rounded-none flex flex-col items-center w-full md:w-1/3 max-w-md">
             <div className="text-6xl md:text-8xl font-bold my-6 md:my-8">3</div>
             <div className="p-6 md:p-8 pt-0">
-              <h3 className="text-xl md:text-2xl font-bold mb-4 text-center">Prati uputstva i preuzmi ulogu u organizaciji</h3>
-              <p className="text-center text-base md:text-lg">Uključi se u aktivnosti i doprinesi na svoj način</p>
+              <h3 className="text-xl md:text-2xl font-bold mb-4 text-center">Učestvovanje na zboru</h3>
+              <p className="text-center text-base md:text-lg">Ako je zbor već zakazan, možete se registrovati za učešće i dobijati obaveštenja o njemu.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Dodatne informacije */}
-      <section className="w-full px-4 py-8 mb-6 md:mb-12">
-        <p className="text-center text-lg md:text-xl font-semibold">
-          Telegram je glavni sredstvo komunikacije za organizovanje i dogovaranje svih detalja oko zborova i drugih
-          aktivnosti u tvojoj mesnoj zajednici.
-        </p>
-      </section>
-
       {/* Postojeca mapa i funkcije */}
       <div className="container mx-auto px-4 md:px-6 pb-16">
         <div className="mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">Mapa beogradskih zborova</h2>
+          <h2 className="text-2xl md:text-4xl font-bold mb-4">Mapa beogradskih zborova</h2>
           <p className="text-base md:text-lg mb-4">
             Pronađite vašu mesnu zajednicu na mapi i saznajte status održavanja zbora građana.
             Možete se registrovati za učešće na zboru ili zakazati novi zbor.
@@ -297,47 +289,6 @@ function ZboroviPage() {
               </div>
             )}
           </>
-        )}
-
-        {/* Info Section */}
-        {!loading && !error && (
-          <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-              <div className="flex items-center mb-4">
-                <div className="w-10 h-10 rounded-full bg-red-700 flex items-center justify-center text-white mr-4">
-                  <span className="font-bold">1</span>
-                </div>
-                <h3 className="text-xl font-semibold">Pronađite svoju mesnu zajednicu</h3>
-              </div>
-              <p className="text-gray-600">
-                Koristite mapu da pronađete vašu mesnu zajednicu i saznate da li se u njoj organizuje zbor građana.
-              </p>
-            </div>
-            
-            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-              <div className="flex items-center mb-4">
-                <div className="w-10 h-10 rounded-full bg-red-700 flex items-center justify-center text-white mr-4">
-                  <span className="font-bold">2</span>
-                </div>
-                <h3 className="text-xl font-semibold">Iniciranje zbora građana</h3>
-              </div>
-              <p className="text-gray-600">
-                Ako u vašoj zajednici još uvek nije zakazan zbor, možete biti prvi koji će ga inicirati klikom na marker na mapi.
-              </p>
-            </div>
-            
-            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-              <div className="flex items-center mb-4">
-                <div className="w-10 h-10 rounded-full bg-red-700 flex items-center justify-center text-white mr-4">
-                  <span className="font-bold">3</span>
-                </div>
-                <h3 className="text-xl font-semibold">Učestvovanje na zboru</h3>
-              </div>
-              <p className="text-gray-600">
-                Ako je zbor već zakazan, možete se registrovati za učešće i dobijati obaveštenja o njemu.
-              </p>
-            </div>
-          </div>
         )}
       </div>
     </div>

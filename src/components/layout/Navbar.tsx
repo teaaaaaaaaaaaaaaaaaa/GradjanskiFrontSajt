@@ -98,8 +98,8 @@ function Navbar() {
 
         {/* Mobile navigation menu */}
         {isMenuOpen && (
-          <div className="md:hidden fixed inset-0 top-16 bg-secondary/95 backdrop-blur-sm z-40 p-6">
-            <div className="flex flex-col space-y-6">
+          <div className="md:hidden fixed left-0 top-16 w-full h-auto bg-black z-40">
+            <div className="flex flex-col p-6 space-y-6">
               {navLinks.map((link) => (
                 <NavLink
                   key={link.path}

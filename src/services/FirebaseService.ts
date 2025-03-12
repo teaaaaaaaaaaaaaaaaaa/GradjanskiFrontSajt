@@ -1067,21 +1067,18 @@ class FirebaseService {
           <body>
             <h1>Potvrđen zbor građana u zajednici ${communityName}</h1>
             <p>Poštovani/a,</p>
-            <p>Obaveštavamo vas da je zbor građana u mesnoj zajednici <strong>${communityName}</strong> potvrđen!</p>
-            <p><strong>Detalji zbora:</strong></p>
-            <ul>
-              <li>Datum: ${assembly.date}</li>
-              <li>Vreme: ${assembly.time}</li>
-              <li>Adresa: ${assembly.address}</li>
-              <li>Opis: ${assembly.description || 'Razgovor o lokalnim problemima i inicijativama'}</li>
-            </ul>
-            <p>Vaše prisustvo je važno za rešavanje problema naše lokalne zajednice.</p>
-            <p>Hvala na podršci!</p>
+            <p>Obaveštavamo vas da je kvorum građanskih potpisa za sazivanje zbora u mesnoj zajednici <strong>"${communityName}"</strong> na adresi ${assembly.address} je ispunjen!</p>
+<p>Sledi link Telegram grupe vaše mesne zajednice:</p>
+<p>https://t.me/+FjHt_TzTDns2MjY0</p>
+
+<p>Oko tačnog vremena sazivanja zbora možete postići dogovor u vašoj Telegram grupi na nivou lokalne samouprave.</p>
+
+<p>Rešenje o sazivanju donešeno od strane sazivača potrebno je dostaviti na mejl
+ adresu "noreply.gradjanskifront@gmail.com", kako bi se sa proverenošću informacije ažurirale na web sajtu.</p>
             <p><strong>Građanski Front</strong></p>
           </body>
         </html>
       `;
-      
       console.log('Šaljem mejlove na adrese:', emails.map(e => e.email).join(', '));
       
       // Grupišemo primatelje u bulkove od po 20 adresa (Brevo ograničenje)

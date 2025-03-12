@@ -7,6 +7,7 @@ import Navbar from './components/layout/Navbar'
 import Footer from './components/layout/Footer'
 import ThemeProvider from './components/theme/ThemeProvider'
 import LoadingScreen from './components/animation/LoadingScreen'
+import ScrollToTop from './components/layout/ScrollToTop'
 
 // Pages
 import HomePage from './pages/HomePage'
@@ -54,6 +55,7 @@ function App() {
       )}
       
       <Router>
+        <ScrollToTop />
         <div className={`flex flex-col min-h-screen bg-white ${showLoading ? 'hidden' : ''}`}>
           <Navbar />
           <main className="flex-grow">
