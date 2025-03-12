@@ -90,6 +90,7 @@ function BelgradeMap({
   const [showRegistrationForm, setShowRegistrationForm] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [localSelectedCommunity, setLocalSelectedCommunity] = useState<string | null>(selectedCommunity);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   useEffect(() => {
     if (selectedCommunity) {
@@ -118,6 +119,11 @@ function BelgradeMap({
 
   const getAssemblyForCommunity = (localCommunityId: string) => {
     return assemblies.find(assembly => assembly.localCommunityId === localCommunityId);
+  };
+
+  const getCommunityName = (communityId: string) => {
+    const community = localCommunities.find(c => c.id === communityId);
+    return community ? community.name : "";
   };
 
   const getMarkerIcon = (localCommunityId: string) => {
@@ -239,13 +245,25 @@ function BelgradeMap({
           );
         })}
 
+        {/* Schedule Form Popup */}
         {showScheduleForm && (
           <div className="calendar-popup">
             <div className="calendar-popup-content">
+              <div className="calendar-popup-header">
+                <h3>Zakaži zbor u {getCommunityName(showScheduleForm)}</h3>
+                <button 
+                  className="calendar-popup-close"
+                  onClick={handleCloseForm}
+                  disabled={isSubmitting}
+                >
+                  <X size={24} />
+                </button>
+              </div>
               <InitiativeForm
                 localCommunityId={showScheduleForm}
                 onSubmit={async (data) => {
                   try {
+                    setIsSubmitting(true);
                     await onScheduleAssembly(
                       data.localCommunityId,
                       data.date,
@@ -260,16 +278,19 @@ function BelgradeMap({
                   } catch (err) {
                     const errorMessage = err instanceof Error ? err.message : 'Došlo je do greške';
                     setFormError(errorMessage);
-                    // Don't close form on error
+                  } finally {
+                    setIsSubmitting(false);
                   }
                 }}
                 onClose={handleCloseForm}
                 formError={formError}
+                hideHeader={true}
               />
             </div>
           </div>
         )}
 
+        {/* Registration Form Popup */}
         {showRegistrationForm && (
           <div className="calendar-popup">
             <div className="calendar-popup-content">
@@ -278,6 +299,7 @@ function BelgradeMap({
                 <button 
                   className="calendar-popup-close"
                   onClick={handleCloseForm}
+                  disabled={isSubmitting}
                 >
                   <X size={24} />
                 </button>
@@ -296,20 +318,19 @@ function BelgradeMap({
                 }}
                 onRegister={async (email, name) => {
                   try {
+                    setIsSubmitting(true);
                     await onRegisterAttendee(email, name, showRegistrationForm || '');
                     handleCloseForm();
                   } catch (err) {
                     setFormError(err instanceof Error ? err.message : 'Došlo je do greške');
+                  } finally {
+                    setIsSubmitting(false);
                   }
                 }}
                 isRegistered={false}
+                formError={formError}
+                hideHeader={true}
               />
-              {formError && (
-                <div className="form-error">
-                  <AlertCircle className="form-error-icon" size={16} />
-                  <span className="form-error-message">{formError}</span>
-                </div>
-              )}
             </div>
           </div>
         )}

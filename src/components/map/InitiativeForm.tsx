@@ -21,9 +21,10 @@ interface InitiativeFormProps {
   onSubmit: (data: InitiativeFormData) => Promise<void>;
   onClose?: () => void;
   formError?: string | null;
+  hideHeader?: boolean;
 }
 
-const InitiativeForm = ({ localCommunityId, onSubmit, onClose, formError: externalError }: InitiativeFormProps) => {
+const InitiativeForm = ({ localCommunityId, onSubmit, onClose, formError: externalError, hideHeader = false }: InitiativeFormProps) => {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [isResident, setIsResident] = useState(false);
@@ -90,12 +91,14 @@ const InitiativeForm = ({ localCommunityId, onSubmit, onClose, formError: extern
 
   return (
     <div className="bg-white rounded-lg shadow-lg max-w-md w-full mx-auto p-6" style={{ maxHeight: '100vh' }}>
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold text-gray-800">Zakaži zbor</h3>
-        <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-          <X size={20} />
-        </button>
-      </div>
+      {!hideHeader && (
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-semibold text-gray-800">Zakaži zbor</h3>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+            <X size={20} />
+          </button>
+        </div>
+      )}
 
       {error && (
         <div className="mb-6 p-3 rounded-md text-sm bg-red-50 border border-red-200 text-red-700">
