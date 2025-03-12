@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Facebook, Instagram, Twitter, Youtube } from 'lucide-react'
+import { Facebook, Instagram, Twitter, Youtube, Mail, MapPin, Phone, FileText, Shield, ExternalLink, HelpCircle } from 'lucide-react'
 
 function Footer() {
   const currentYear = new Date().getFullYear()
@@ -12,88 +12,122 @@ function Footer() {
   ]
 
   return (
-    <footer className="bg-secondary text-white py-8">
+    <footer className="bg-secondary text-white py-12">
       <div className="container mx-auto px-6">
-        <div className="flex flex-col md:flex-row">
-          {/* Large Logo on Left */}
-          <div className="md:w-1/3 flex justify-center md:justify-start mb-6 md:mb-0">
-            <Link to="/">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+          {/* Logo and Mission */}
+          <div className="col-span-1 md:col-span-1">
+            <Link to="/" className="block mb-4">
               <img 
                 src="/5__1_-removebg-preview.png" 
                 alt="Građanski Front Logo" 
-                className="h-32 md:h-40" 
+                className="h-30 md:h-32" 
               />
             </Link>
+            <p className="text-white/80 text-sm mt-4">
+              Platforma za organizovanje građana kroz radne grupe i zborove. Zajedno stvaramo promene koje su nam potrebne.
+            </p>
           </div>
           
-          {/* Links on Right */}
-          <div className="md:w-2/3 flex flex-col justify-between">
-            {/* Top Row - Navigation Links */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <h3 className="text-white font-bold text-lg mb-2">Brzi linkovi</h3>
-                <ul className="space-y-1">
-                  <li>
-                    <Link to="/" className="gf-footer-link text-sm">Početna</Link>
-                  </li>
-                  <li>
-                    <Link to="/zborovi" className="gf-footer-link text-sm">Zborovi</Link>
-                  </li>
-                  <li>
-                    <Link to="/radne-grupe" className="gf-footer-link text-sm">Radne grupe</Link>
-                  </li>
-                  <li>
-                    <Link to="/mapa" className="gf-footer-link text-sm">Mapa</Link>
-                  </li>
-                </ul>
-              </div>
+          {/* Quick Links */}
+          <div>
+            <h3 className="text-white font-bold text-lg mb-4">Brzi linkovi</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/" className="text-white/70 hover:text-white transition-colors text-sm flex items-center">
+                  <span className="w-5">•</span> Početna
+                </Link>
+              </li>
+              <li>
+                <Link to="/zborovi" className="text-white/70 hover:text-white transition-colors text-sm flex items-center">
+                  <span className="w-5">•</span> Zborovi
+                </Link>
+              </li>
+              <li>
+                <Link to="/radne-grupe" className="text-white/70 hover:text-white transition-colors text-sm flex items-center">
+                  <span className="w-5">•</span> Radne grupe
+                </Link>
+              </li>
+              <li>
+                <Link to="/mapa" className="text-white/70 hover:text-white transition-colors text-sm flex items-center">
+                  <span className="w-5">•</span> Mapa
+                </Link>
+              </li>
+              <li>
+                <Link to="/obavesti-me" className="text-white/70 hover:text-white transition-colors text-sm flex items-center">
+                  <span className="w-5">•</span> Obavesti me
+                </Link>
+              </li>
+            </ul>
+          </div>
 
-              <div>
-                <h3 className="text-white font-bold text-lg mb-2">Resursi</h3>
-                <ul className="space-y-1">
-                  <li>
-                    <Link to="/obavesti-me" className="gf-footer-link text-sm">Obavesti me</Link>
-                  </li>
-                  <li>
-                    <a href="#" className="gf-footer-link text-sm">Blog</a>
-                  </li>
-                  <li>
-                    <a href="#" className="gf-footer-link text-sm">Dokumenti</a>
-                  </li>
-                  <li>
-                    <a href="#" className="gf-footer-link text-sm">FAQ</a>
-                  </li>
-                </ul>
-              </div>
+          {/* Resources */}
+          <div>
+            <h3 className="text-white font-bold text-lg mb-4">Dokumenti</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/privacy-policy" className="text-white/70 hover:text-white transition-colors text-sm flex items-center">
+                  <Shield className="h-4 w-4 mr-2" /> Politika privatnosti
+                </Link>
+              </li>
+              <li>
+                <Link to="/terms" className="text-white/70 hover:text-white transition-colors text-sm flex items-center">
+                  <FileText className="h-4 w-4 mr-2" /> Uslovi korišćenja
+                </Link>
+              </li>
+              <li>
+                <a href="https://www.blokada.info/" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-white transition-colors text-sm flex items-center">
+                  <ExternalLink className="h-4 w-4 mr-2" /> INFO
+                </a>
+              </li>
+              <li>
+                <Link to="/#faq" className="text-white/70 hover:text-white transition-colors text-sm flex items-center">
+                  <HelpCircle className="h-4 w-4 mr-2" /> FAQ
+                </Link>
+              </li>
+            </ul>
+          </div>
 
-              <div>
-                <h3 className="text-white font-bold text-lg mb-2">Pratite nas</h3>
-                <div className="flex space-x-4">
+          {/* Contact */}
+          <div>
+            <h3 className="text-white font-bold text-lg mb-4">Kontakt</h3>
+            <ul className="space-y-3">
+              <li className="flex items-start">
+                <Mail className="h-5 w-5 text-primary mr-2 flex-shrink-0 mt-0.5" />
+                <span className="text-white/70 text-sm">info@gradjanskifront.rs</span>
+              </li>
+              <li className="flex items-start">
+                <MapPin className="h-5 w-5 text-primary mr-2 flex-shrink-0 mt-0.5" />
+                <span className="text-white/70 text-sm">Beograd, Srbija</span>
+              </li>
+              <li>
+                <h4 className="text-white font-medium text-sm mb-2 mt-4">Pratite nas</h4>
+                <div className="flex space-x-3">
                   {socialLinks.map((social, index) => (
                     <a
                       key={index}
                       href={social.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-white/70 hover:text-white transition-colors"
+                      className="bg-white/10 hover:bg-primary text-white h-8 w-8 rounded-full flex items-center justify-center transition-colors"
                       aria-label={social.label}
                     >
                       {social.icon}
                     </a>
                   ))}
                 </div>
-              </div>
-            </div>
+              </li>
+            </ul>
           </div>
         </div>
         
         {/* Bottom Row - Copyright */}
-        <div className="mt-6 pt-4 border-t border-white/10 text-center">
-          <p className="text-white/70 text-sm">
-            Platforma za organizovanje građana kroz radne grupe i zborove.
-          </p>
-          <p className="text-white/50 text-sm mt-2">
+        <div className="mt-10 pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center">
+          <p className="text-white/50 text-sm">
             © {currentYear} Građanski Front. Sva prava zadržana.
+          </p>
+          <p className="text-white/50 text-sm mt-2 md:mt-0">
+            Platforma za organizovanje građana kroz radne grupe i zborove.
           </p>
         </div>
       </div>

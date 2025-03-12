@@ -32,7 +32,6 @@ function Navbar() {
     { name: 'Početna', path: '/' },
     { name: 'Zborovi', path: '/zborovi' },
     { name: 'Radne grupe', path: '/radne-grupe' },
-    { name: 'Mapa', path: '/mapa' },
   ]
 
   // Transparent only when on home page and not scrolled
@@ -43,7 +42,7 @@ function Navbar() {
       color: '#ffffff', // Always white
       fontWeight: isActive ? 'bold' : 'normal',
       fontSize: '0.875rem', // text-sm
-      textTransform: 'uppercase',
+      textTransform: 'uppercase' as const,
       letterSpacing: '0.05em', // tracking-wide
       transition: 'all 0.2s ease',
     }
@@ -54,7 +53,7 @@ function Navbar() {
   }
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 h-16 md:h-20 transition-all duration-300 ${
+    <nav className={`fixed top-0 left-0 right-0 z-50 h-16 md:h-24 transition-all duration-300 ${
       shouldBeTransparent ? 'bg-transparent' : 'bg-secondary shadow-md backdrop-blur-sm'
     }`}>
       <div className="container mx-auto px-6 h-full flex items-center justify-between">
@@ -67,8 +66,24 @@ function Navbar() {
           {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
 
-        {/* Desktop navigation links - left side */}
-        <div className="hidden md:flex items-center space-x-6">
+        {/* Logo - left aligned and much larger */}
+        <div className="flex items-center">
+          <Link to="/" className="flex items-center">
+            <img 
+              src="/5__1_-removebg-preview.png" 
+              alt="Građanski Front Logo" 
+              className="h-20 w-auto" 
+              style={{ 
+                maxHeight: "none",
+                height: "80px",
+                display: "block"
+              }} 
+            />
+          </Link>
+        </div>
+
+        {/* Desktop navigation links - right side */}
+        <div className="hidden md:flex items-center space-x-8 ml-auto">
           {navLinks.map((link) => (
             <NavLink
               key={link.path}
@@ -80,16 +95,6 @@ function Navbar() {
             </NavLink>
           ))}
         </div>
-
-        {/* Logo - centered with top margin */}
-        <div className="absolute left-1/2 transform -translate-x-1/2 z-10 mt-3">
-          <Link to="/" className="flex items-center">
-            <img src="/5__1_-removebg-preview.png" alt="Građanski Front Logo" className="h-32 md:h-48" />
-          </Link>
-        </div>
-
-        {/* Empty div to maintain navbar layout */}
-        <div className="hidden md:block w-[120px]"></div>
 
         {/* Mobile navigation menu */}
         {isMenuOpen && (

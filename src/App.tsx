@@ -19,6 +19,8 @@ import NotFoundPage from './pages/NotFoundPage'
 import GRGLogistika from './pages/GRGLogistika'
 import GRGBezbednost from './pages/GRGBezbednost'
 import GRGKomunikacija from './pages/GRGKomunikacija'
+import PrivacyPolicy from './pages/PrivacyPolicy'
+import Terms from './pages/Terms'
 
 function App() {
   const [showLoading, setShowLoading] = useState(true)
@@ -65,6 +67,8 @@ function App() {
               <Route path="/zborovi" element={<ZboroviPage />} />
               <Route path="/obavesti-me" element={<ObavestiMe />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<Terms />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </main>

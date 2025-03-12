@@ -208,36 +208,36 @@ function ObavestiMe() {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Form Column - Scrollable */}
-            <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
-              <div className="p-6">
+              <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
+                <div className="p-6">
                 <h2 className="text-xl font-bold mb-6">Podešavanja obaveštenja</h2>
                 
                 {successMessage && (
                   <div className="bg-green-100 border border-green-200 text-green-800 rounded-md p-4 mb-6 animate-fade-in">
                     <p className="text-sm">{successMessage}</p>
-                  </div>
+                      </div>
                 )}
                 
                 {error && (
                   <div className="bg-destructive/10 border border-destructive/20 text-destructive rounded-md p-4 mb-6 animate-fade-in">
                     <p className="text-sm">{error}</p>
-                  </div>
+                    </div>
                 )}
                 
-                <form onSubmit={handleSubmit}>
-                  <div className="space-y-6">
-                    <div>
-                      <label htmlFor="email" className="block text-sm font-medium mb-2">
+                    <form onSubmit={handleSubmit}>
+                      <div className="space-y-6">
+                        <div>
+                          <label htmlFor="email" className="block text-sm font-medium mb-2">
                         Email adresa <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="email"
-                        id="email"
+                          </label>
+                          <input
+                            type="email"
+                            id="email"
                         className="w-full px-3 py-2 rounded-md border border-input bg-background"
-                        placeholder="vasa.adresa@email.com"
-                        required
-                      />
-                    </div>
+                            placeholder="vasa.adresa@email.com"
+                            required
+                          />
+                        </div>
                     
                     <div className="mb-8">
                       <h3 className="text-xl font-bold mb-4">Izaberite vašu mesnu zajednicu</h3>
@@ -255,14 +255,14 @@ function ObavestiMe() {
                           ))}
                         </select>
                       </div>
-                    </div>
-                    
-                    <div>
+                        </div>
+
+                        <div>
                       <label className="block text-sm font-medium mb-2">
                         Kategorije koje vas interesuju
-                      </label>
+                          </label>
                       <div className="space-y-3">
-                        {categories.map((category) => (
+                            {categories.map((category) => (
                           <div key={category.id} className="flex items-center">
                             <input
                               type="checkbox"
@@ -277,12 +277,12 @@ function ObavestiMe() {
                             >
                               {category.name}
                             </label>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div>
+                        </div>
+
+                        <div>
                       <label className="block text-sm font-medium mb-2">
                         Učestalost obaveštenja
                       </label>
@@ -357,11 +357,11 @@ function ObavestiMe() {
                     >
                       Prijavi me za obaveštenja
                     </button>
-                  </div>
-                </form>
+                      </div>
+                    </form>
               </div>
             </div>
-            
+
             {/* Events Column - Fixed */}
             <div className="relative">
               <div className="sticky top-28 bg-card rounded-lg shadow-sm border border-border overflow-hidden">
@@ -387,7 +387,7 @@ function ObavestiMe() {
                       <div className="flex items-start gap-4">
                         <div className="flex-shrink-0 h-12 w-12 flex items-center justify-center rounded-full bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                           <BarChart className="h-6 w-6" />
-                        </div>
+                </div>
                         <div className="flex-grow">
                           <h3 className="font-medium group-hover:text-blue-600 transition-colors">Plenum o kulturnoj politici</h3>
                           <p className="text-sm text-muted-foreground">18. jun 2023. u 19:00</p>
@@ -410,7 +410,7 @@ function ObavestiMe() {
                         </div>
                       </div>
                     </div>
-                  </div>
+                </div>
                   
                   <Link
                     to="/mapa"

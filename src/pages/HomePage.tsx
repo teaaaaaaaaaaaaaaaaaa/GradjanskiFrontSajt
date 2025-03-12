@@ -39,30 +39,45 @@ function HomePage() {
 
   const faqs = [
     {
-      question: 'Šta je Građanski front?',
-      answer:
-        'Građanski front je platforma za organizovanje građana kroz radne grupe i zborove, sa ciljem aktivnog učešća u društvenim promenama i demokratskim procesima.',
+      question: "Šta je Građanski Front?",
+      answer: "Građanski Front je platforma za organizovanje građana kroz radne grupe i zborove. Naš cilj je da olakšamo koordinaciju i komunikaciju između građana koji žele da se aktivno uključe u društvene promene."
     },
     {
-      question: 'Kako mogu da se pridružim radnoj grupi?',
-      answer:
-        'Možete se pridružiti radnoj grupi tako što ćete se registrovati na našem sajtu, a zatim odabrati radnu grupu koja odgovara vašim interesima i veštinama. Takođe možete popuniti formular za preporuku radne grupe.',
+      question: "Kako se mogu pridružiti radnoj grupi?",
+      answer: "Možete se pridružiti radnoj grupi pristupom na link Telegram grupe za određenu radnu grupu."
     },
     {
-      question: 'Šta su plenumi i zborovi?',
-      answer:
-        'Plenumi su otvoreni sastanci na kojima građani diskutuju o važnim pitanjima i donose odluke. Zborovi su lokalni sastanci organizovani u mesnim zajednicama gde se rešavaju problemi specifični za to područje.',
+      question: "Kako mogu da učestvujem na zboru?",
+      answer: "Na stranici 'zborovi' možete odabrati svoju mesnu zajednicu i klikom na nju dati predlog za održavanje zbora na lokalnom nivou."
     },
     {
-      question: 'Kako mogu da organizujem zbor u mojoj mesnoj zajednici?',
-      answer:
-        'Da biste organizovali zbor, potrebno je da se registrujete, a zatim kroz sekciju "Zborovi" popunite formular za organizovanje zbora. Naš tim će vam pružiti podršku u organizaciji.',
+      question: "Kako mogu da pomognem?", 
+      answer: "Na stranici 'radne grupe' možete pronaći različite načine da se uključite u aktivnosti Građanskog Fronta, od logistike do komunikacije."
     },
     {
-      question: 'Da li moram biti član da bih učestvovao/la u aktivnostima?',
-      answer:
-        'Ne, većina aktivnosti je otvorena za sve građane. Međutim, registracija vam omogućava da dobijate obaveštenja, učestvujete u radnim grupama i imate pristup dodatnim resursima.',
+      question: "Da li je Građanski front zvanična organizacija?",
+      answer: "Ne, Građanski front nije formalna organizacija, već digitalna platforma koja pomaže u povezivanju ljudi i širenju informacija."
     },
+    {
+      question: "Ko stoji iza Građanskog fronta?",
+      answer: "Građanski front čini grupa građana koji veruju u pravo na otpor i demokratiju. Platforma nije vezana za političke stranke."
+    },
+    {
+      question: "Kako mogu da pomognem ako ne mogu fizički da prisustvujem protestima i zborovima?",
+      answer: "Možete širiti informacije na društvenim mrežama, donirati resurse ili pomoći u organizaciji iz pozadine."
+    },
+    {
+      question: "Kako se razlikujemo od drugih aktivističkih pokreta?",
+      answer: "Građanski front se fokusira na povezivanje i logističku podršku građanima, uz transparentne informacije i digitalnu koordinaciju."
+    },
+    {
+      question: "Šta radimo ako vlasti pokušaju da blokiraju pristup sajtu?",
+      answer: "Imamo alternativne komunikacione kanale, Telegram grupe, kako one vezane za radne grupe tako i one na nivou mesne zajednice."
+    },
+    {
+      question: "Ko može da koristi platformu Građanskog Fronta?",
+      answer: "Platforma je otvorena za sve građane koji žele da se informišu ili uključe u aktivnosti protesta."
+    }
   ]
 
   return (
@@ -72,7 +87,7 @@ function HomePage() {
         {/* Video Background */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <div className="absolute inset-0 bg-black opacity-50 z-10"></div>
-          <video
+          <video 
             autoPlay
             loop
             muted
@@ -83,7 +98,7 @@ function HomePage() {
             Your browser does not support the video tag.
           </video>
         </div>
-
+        
         {/* Content */}
         <div className="container mx-auto px-6 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mx-auto max-w-[80%]">
@@ -296,10 +311,9 @@ function HomePage() {
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl md:text-4xl font-anton mb-4">INTERAKTIVNA MAPA AKTIVNOSTI</h2>
+              <h1 className="text-5xl md:text-6xl font-anton mb-6">INTERAKTIVNA MAPA ZBOROVA</h1>
               <p className="text-lg text-foreground/80 mb-6">
-                Pronađite najbliže zborove i aktivnosti u vašem okruženju. Filtrirajte po
-                datumu, vrsti događaja i lokaciji.
+                Pronađite najbliže zborove u vašem okruženju. Pratite novosti i uključite se u rad lokalne zajednice kroz zborove građana. <br></br><strong>Zajedno možemo napraviti promene koje su nam potrebne.</strong>
               </p>
               <ul className="space-y-4 mb-8">
                 <li className="flex items-start">
@@ -316,18 +330,40 @@ function HomePage() {
                 </li>
               </ul>
               <Link
-                to="/mapa"
+                to="/zborovi"
                 className="gf-button gf-button-primary rounded-md inline-flex items-center justify-center"
               >
                 Istraži mapu
                 <MapPin className="ml-2 h-5 w-5" />
               </Link>
             </div>
-            <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-100">
-              <div className="aspect-video bg-gray-50 rounded-md flex items-center justify-center">
-                <p className="text-foreground/60">Interaktivna mapa će biti učitana ovde</p>
+            <Link to="/zborovi" className="block">
+              <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 cursor-pointer">
+                <div className="aspect-video bg-gray-50 rounded-md overflow-hidden relative group">
+                  {/* Map image */}
+                  <img 
+                    src="/mapica.png" 
+                    alt="Interaktivna mapa zborova" 
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  
+                  {/* Static overlay - always visible */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none"></div>
+                  
+                  {/* Red pin markers highlight effect */}
+                  <div className="absolute inset-0 bg-primary/10 mix-blend-color-burn pointer-events-none"></div>
+                  
+                  {/* Text overlay at bottom */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                    <h3 className="font-bold text-lg drop-shadow-md">Mapa zborova Beograda</h3>
+                    <p className="text-sm text-white/80 drop-shadow-md">Pronađite i pridružite se zborovima u vašoj mesnoj zajednici</p>
+                  </div>
+                  
+                  {/* Simple hover overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-b from-primary/30 to-primary/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </div>
               </div>
-            </div>
+            </Link>
           </div>
         </div>
       </section>
@@ -365,30 +401,68 @@ function HomePage() {
             </p>
           </div>
 
-          <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-md p-6 border border-gray-100">
-            {faqs.map((faq, index) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            {/* Left Column */}
+            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition-shadow duration-300">
+              {faqs.slice(0, 5).map((faq, index) => (
               <div
                 key={index}
-                className="border-b border-gray-100 last:border-0 py-5"
+                  className="border-b border-gray-100 last:border-0 py-6"
               >
                 <button
                   onClick={() => toggleFaq(index)}
-                  className="flex justify-between items-center w-full text-left"
+                    className="flex justify-between items-center w-full text-left group"
                 >
-                  <h3 className="text-lg font-bold">{faq.question}</h3>
+                    <h3 className="text-lg font-bold group-hover:text-primary transition-colors duration-200">{faq.question}</h3>
                   <ChevronDown
-                    className={`h-5 w-5 text-foreground/60 transition-transform ${
+                      className={`h-5 w-5 text-foreground/60 transition-transform duration-300 group-hover:text-primary ${
                       expandedFaq === index ? 'rotate-180' : ''
                     }`}
                   />
                 </button>
-                {expandedFaq === index && (
-                  <div className="mt-4 text-foreground/80">
-                    <p>{faq.answer}</p>
+                  <div 
+                    className={`mt-4 text-foreground/80 overflow-hidden transition-all duration-300 ease-in-out ${
+                      expandedFaq === index 
+                        ? 'max-h-96 opacity-100 transform translate-y-0' 
+                        : 'max-h-0 opacity-0 transform -translate-y-2'
+                    }`}
+                  >
+                    <p className="transform transition-transform duration-300 ease-in-out">{faq.answer}</p>
                   </div>
-                )}
+                </div>
+              ))}
+            </div>
+            
+            {/* Right Column */}
+            <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition-shadow duration-300">
+              {faqs.slice(5, 10).map((faq, index) => (
+                <div
+                  key={index + 5}
+                  className="border-b border-gray-100 last:border-0 py-6"
+                >
+                  <button
+                    onClick={() => toggleFaq(index + 5)}
+                    className="flex justify-between items-center w-full text-left group"
+                  >
+                    <h3 className="text-lg font-bold group-hover:text-primary transition-colors duration-200">{faq.question}</h3>
+                    <ChevronDown
+                      className={`h-5 w-5 text-foreground/60 transition-transform duration-300 group-hover:text-primary ${
+                        expandedFaq === index + 5 ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+                  <div 
+                    className={`mt-4 text-foreground/80 overflow-hidden transition-all duration-300 ease-in-out ${
+                      expandedFaq === index + 5 
+                        ? 'max-h-96 opacity-100 transform translate-y-0' 
+                        : 'max-h-0 opacity-0 transform -translate-y-2'
+                    }`}
+                  >
+                    <p className="transform transition-transform duration-300 ease-in-out">{faq.answer}</p>
+                  </div>
               </div>
             ))}
+            </div>
           </div>
         </div>
       </section>
