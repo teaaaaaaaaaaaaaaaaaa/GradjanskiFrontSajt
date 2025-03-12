@@ -12,6 +12,7 @@ import RadneGrupe from './pages/RadneGrupe'
 import MapaPage from './pages/MapaPage'
 import ObavestiMe from './pages/ObavestiMe'
 import ZboroviPage from './pages/ZboroviPage'
+import PlenumiPage from './pages/PlenumiPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import ProfilePage from './pages/ProfilePage'
@@ -29,6 +30,7 @@ function App() {
               <Route path="/radne-grupe" element={<RadneGrupe />} />
               <Route path="/mapa" element={<MapaPage />} />
               <Route path="/zborovi" element={<ZboroviPage />} />
+              <Route path="/plenumi" element={<PlenumiPage />} />
               <Route path="/obavesti-me" element={<ObavestiMe />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />

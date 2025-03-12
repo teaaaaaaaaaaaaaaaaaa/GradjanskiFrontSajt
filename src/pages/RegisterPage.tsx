@@ -1,8 +1,12 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock, User, MapPin, Check } from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext'
 
 function RegisterPage() {
+  const { register, error: authError, loading: authLoading } = useAuth()
+  const navigate = useNavigate()
+  
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -15,7 +19,6 @@ function RegisterPage() {
   })
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [step, setStep] = useState(1)
 
@@ -50,7 +53,7 @@ function RegisterPage() {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
     
@@ -71,14 +74,24 @@ function RegisterPage() {
     }
     
     // Submit form
-    setIsLoading(true)
-
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false)
-      // For demo purposes, always show error
-      setError('Funkcionalnost registracije još uvek nije implementirana.')
-    }, 1500)
+    if (!formData.agreeTerms) {
+      setError('Morate prihvatiti uslove korišćenja.')
+      return
+    }
+    
+    try {
+      await register({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+        location: formData.location,
+      })
+      
+      navigate('/mapa') // Redirect to map page after successful registration
+    } catch (err) {
+      setError('Greška prilikom registracije. Pokušajte ponovo.')
+    }
   }
 
   const toggleShowPassword = () => {
@@ -107,9 +120,9 @@ function RegisterPage() {
 
             <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
               <div className="p-6">
-                {error && (
+                {(error || authError) && (
                   <div className="bg-destructive/10 border border-destructive/20 text-destructive rounded-md p-3 mb-6">
-                    {error}
+                    {error || authError}
                   </div>
                 )}
 
@@ -256,45 +269,29 @@ function RegisterPage() {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium mb-3">
+                        <label className="block text-sm font-medium mb-2">
                           Oblasti interesovanja
                         </label>
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-2 gap-2">
                           {interestOptions.map((interest) => (
-                            <div
-                              key={interest.id}
-                              className={`flex items-center p-3 rounded-md border cursor-pointer transition-colors ${
-                                formData.interests.includes(interest.id)
-                                  ? 'border-primary bg-primary/5'
-                                  : 'border-input hover:border-primary/50'
-                              }`}
-                              onClick={() => {
-                                const isSelected = formData.interests.includes(interest.id)
-                                const updatedInterests = isSelected
-                                  ? formData.interests.filter((id) => id !== interest.id)
-                                  : [...formData.interests, interest.id]
-                                
-                                setFormData({ ...formData, interests: updatedInterests })
-                              }}
-                            >
-                              <div
-                                className={`w-5 h-5 rounded border flex items-center justify-center mr-3 ${
-                                  formData.interests.includes(interest.id)
-                                    ? 'bg-primary border-primary'
-                                    : 'border-input'
-                                }`}
+                            <div key={interest.id} className="flex items-center">
+                              <input
+                                type="checkbox"
+                                id={`interest-${interest.id}`}
+                                name={`interest-${interest.id}`}
+                                className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
+                                checked={formData.interests.includes(interest.id)}
+                                onChange={handleChange}
+                              />
+                              <label
+                                htmlFor={`interest-${interest.id}`}
+                                className="ml-2 block text-sm text-muted-foreground"
                               >
-                                {formData.interests.includes(interest.id) && (
-                                  <Check className="h-3 w-3 text-white" />
-                                )}
-                              </div>
-                              <span>{interest.label}</span>
+                                {interest.label}
+                              </label>
                             </div>
                           ))}
                         </div>
-                        <p className="text-xs text-muted-foreground mt-2">
-                          Izaberite oblasti koje vas interesuju. Na osnovu toga ćemo vam preporučiti radne grupe.
-                        </p>
                       </div>
 
                       <div className="flex items-center">
@@ -307,14 +304,17 @@ function RegisterPage() {
                           onChange={handleChange}
                           required
                         />
-                        <label htmlFor="agreeTerms" className="ml-2 block text-sm text-muted-foreground">
-                          Slažem se sa{' '}
-                          <Link to="/uslovi" className="text-primary hover:underline">
-                            uslovima korišćenja
+                        <label
+                          htmlFor="agreeTerms"
+                          className="ml-2 block text-sm text-muted-foreground"
+                        >
+                          Prihvatam{' '}
+                          <Link to="/terms" className="text-primary hover:underline">
+                            uslove korišćenja
                           </Link>{' '}
                           i{' '}
-                          <Link to="/privatnost" className="text-primary hover:underline">
-                            politikom privatnosti
+                          <Link to="/privacy" className="text-primary hover:underline">
+                            politiku privatnosti
                           </Link>
                         </label>
                       </div>
@@ -322,17 +322,17 @@ function RegisterPage() {
                       <div className="flex gap-4">
                         <button
                           type="button"
-                          className="w-1/2 px-4 py-3 bg-secondary text-foreground rounded-md font-medium hover:bg-secondary/80 transition-colors"
+                          className="flex-1 px-4 py-3 bg-secondary text-foreground rounded-md font-medium hover:bg-secondary/80 transition-colors"
                           onClick={goBack}
                         >
                           Nazad
                         </button>
                         <button
                           type="submit"
-                          className="w-1/2 px-4 py-3 bg-primary text-white rounded-md font-medium hover:bg-primary/90 transition-colors flex items-center justify-center"
-                          disabled={isLoading || !formData.agreeTerms}
+                          className="flex-1 px-4 py-3 bg-primary text-white rounded-md font-medium hover:bg-primary/90 transition-colors flex items-center justify-center"
+                          disabled={authLoading}
                         >
-                          {isLoading ? (
+                          {authLoading ? (
                             <>
                               <span className="mr-2">Registracija...</span>
                               <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>

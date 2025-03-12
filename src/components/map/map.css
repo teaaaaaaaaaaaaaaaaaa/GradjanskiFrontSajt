@@ -1,0 +1,341 @@
+.marker-pin {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  position: relative;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  border: 3px solid white;
+}
+
+.marker-pin::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 18px;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 12px solid currentColor;
+  transform: translateX(-50%);
+}
+
+.marker-pin-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.never-scheduled .marker-pin {
+  background-color: #ef4444; /* red-500 */
+  color: #ef4444;
+}
+
+.scheduled .marker-pin {
+  background-color: #eab308; /* yellow-500 */
+  color: #eab308;
+}
+
+.confirmed .marker-pin {
+  background-color: #22c55e; /* green-500 */
+  color: #22c55e;
+}
+
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  border-radius: 0.5rem;
+}
+
+.map-container .leaflet-popup-content-wrapper {
+  border-radius: 0.5rem;
+}
+
+.map-container .leaflet-popup-content {
+  margin: 0;
+  padding: 0;
+}
+
+.map-container .leaflet-popup-close-button {
+  color: #666;
+  font-size: 16px;
+  padding: 4px;
+  right: 4px;
+  top: 4px;
+}
+
+/* Calendar popup styles */
+.calendar-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.calendar-popup-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 450px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.calendar-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.calendar-popup-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.calendar-popup-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+}
+
+.calendar-popup-body {
+  margin-bottom: 16px;
+}
+
+.calendar-popup-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+/* Petition form styles */
+.petition-form {
+  max-width: 100%;
+}
+
+.petition-form-header {
+  margin-bottom: 16px;
+}
+
+.petition-form-body {
+  margin-bottom: 16px;
+}
+
+.petition-form-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.signature-count {
+  display: inline-flex;
+  align-items: center;
+  background-color: #f3f4f6;
+  padding: 4px 8px;
+  border-radius: 16px;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.signature-count.confirmed {
+  background-color: rgba(42, 157, 143, 0.1);
+  color: #2a9d8f;
+}
+
+.signature-count.scheduled {
+  background-color: rgba(255, 183, 3, 0.1);
+  color: #d97706;
+}
+
+/* Form error message */
+.form-error {
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: rgb(185, 28, 28);
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.form-error-icon {
+  flex-shrink: 0;
+  margin-right: 8px;
+  margin-top: 2px;
+}
+
+.form-error-message {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Form success message */
+.form-success {
+  background-color: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: rgb(6, 95, 70);
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.form-success-icon {
+  flex-shrink: 0;
+  margin-right: 8px;
+  margin-top: 2px;
+}
+
+.form-success-message {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Custom checkbox styling */
+.custom-checkbox {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.custom-checkbox input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #d1d5db;
+  border-radius: 4px;
+  margin-right: 8px;
+  margin-top: 2px;
+  background-color: white;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.custom-checkbox input[type="checkbox"]:checked {
+  background-color: #e63946;
+  border-color: #e63946;
+}
+
+.custom-checkbox input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.custom-checkbox label {
+  font-size: 14px;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+/* Animation for success message */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-10px); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out forwards;
+}
+
+.animate-fade-out {
+  animation: fadeOut 0.3s ease-in-out forwards;
+}
+
+/* Custom popup styling */
+.custom-popup .leaflet-popup-content-wrapper {
+  padding: 0;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.custom-popup .leaflet-popup-content {
+  margin: 0;
+  width: 250px !important;
+}
+
+.popup-content {
+  padding: 16px;
+}
+
+.popup-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #111827;
+}
+
+.popup-info {
+  margin-bottom: 16px;
+}
+
+.popup-info p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.popup-info p strong {
+  color: #111827;
+}
+
+.popup-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.popup-button {
+  width: 100%;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.popup-button.schedule {
+  background-color: #ef4444;
+  color: white;
+}
+
+.popup-button.schedule:hover {
+  background-color: #dc2626;
+}
+
+.popup-button.register {
+  background-color: #ffb703;
+  color: #111827;
+} 

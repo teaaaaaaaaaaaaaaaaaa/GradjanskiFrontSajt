@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, Moon, Sun } from 'lucide-react'
+import { useTheme } from '../theme/ThemeProvider'
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const { theme } = useTheme()
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
@@ -30,6 +32,7 @@ function Navbar() {
     { name: 'Zborovi', path: '/zborovi' },
     { name: 'Radne grupe', path: '/radne-grupe' },
     { name: 'Mapa', path: '/mapa' },
+    { name: 'Plenumi', path: '/plenumi' },
   ]
 
   const authLinks = [
@@ -75,6 +78,14 @@ function Navbar() {
 
         {/* Auth links - right side */}
         <div className="hidden md:flex items-center space-x-4">
+          {/* Theme toggle button */}
+          <button
+            className="p-2 rounded-md hover:bg-secondary/10 transition-colors"
+            aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+          >
+            {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+          </button>
+          
           {authLinks.map((link, index) => (
             <NavLink
               key={link.path}
