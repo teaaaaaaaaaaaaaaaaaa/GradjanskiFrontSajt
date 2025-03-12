@@ -982,7 +982,7 @@ class FirebaseService {
       console.log('Brevo API ključ je pronađen, pokušavam slanje...');
       
       // Definišemo adresu pošiljaoca - ovo mora biti verifikovana adresa u Brevo sistemu
-      const senderEmail = 'noreply.gradjanskifront@gmail.com'; // Verifikovana adresa u Brevo
+      const senderEmail = 'infogradjanskifront@gmail.com'; // Verifikovana adresa u Brevo
       const senderName = 'Građanski Front';
       
       const response = await axios.post(

@@ -87,7 +87,7 @@ function Footer() {
             <ul className="space-y-3">
               <li className="flex items-start">
                 <Mail className="h-5 w-5 text-primary mr-2 flex-shrink-0 mt-0.5" />
-                <span className="text-white/70 text-sm">info@gradjanskifront.rs</span>
+                <span className="text-white/70 text-sm">infogradjanskifront@gmail.com</span>
               </li>
               <li className="flex items-start">
                 <MapPin className="h-5 w-5 text-primary mr-2 flex-shrink-0 mt-0.5" />
