@@ -11,6 +11,8 @@ function ZboroviPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [testEmailSending, setTestEmailSending] = useState(false)
+  const [testEmailResult, setTestEmailResult] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchAssemblies = async () => {
@@ -73,6 +75,31 @@ function ZboroviPage() {
     }
   }
 
+  const handleTestEmailSend = async () => {
+    setTestEmailSending(true);
+    setTestEmailResult(null);
+    try {
+      const testEmail = prompt('Unesite email adresu za testiranje:');
+      if (!testEmail) {
+        setTestEmailSending(false);
+        return;
+      }
+      
+      const result = await FirebaseService.testSendEmail(testEmail, 'Test Korisnik');
+      
+      if (result) {
+        setTestEmailResult('Test mejl je uspešno poslat! Proverite navedenu email adresu.');
+      } else {
+        setTestEmailResult('Slanje test mejla nije uspelo. Proverite konzolu za više detalja.');
+      }
+    } catch (err) {
+      console.error('Greška pri testiranju slanja mejla:', err);
+      setTestEmailResult('Greška pri testiranju slanja mejla. Proverite konzolu za više detalja.');
+    } finally {
+      setTestEmailSending(false);
+    }
+  };
+
   return (
     <div className="pt-16">
       <section className="bg-muted py-12">
@@ -129,6 +156,24 @@ function ZboroviPage() {
             {error && (
               <div className="mt-4 bg-destructive/10 border border-destructive/20 text-destructive rounded-md p-4 animate-fade-in">
                 <p className="text-sm">{error}</p>
+              </div>
+            )}
+
+            {import.meta.env.DEV && (
+              <div className="mt-6">
+                <button
+                  type="button"
+                  onClick={handleTestEmailSend}
+                  disabled={testEmailSending}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors"
+                >
+                  {testEmailSending ? 'Slanje test mejla...' : 'Testiraj slanje mejla'}
+                </button>
+                {testEmailResult && (
+                  <div className={`mt-2 p-3 rounded-md text-sm ${testEmailResult.includes('uspešno') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                    {testEmailResult}
+                  </div>
+                )}
               </div>
             )}
           </div>

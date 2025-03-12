@@ -14,16 +14,16 @@ import {
   setDoc,
   DocumentData
 } from 'firebase/firestore';
+import axios from 'axios';
 
 // Firebase konfiguracija
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+  apiKey: "AIzaSyBCTkM9QrnYcpbgx3VrwunN0__oX7XD6Uc",
+  authDomain: "gradjanskifront.firebaseapp.com",
+  projectId: "gradjanskifront",
+  storageBucket: "gradjanskifront.firebasestorage.app",
+  messagingSenderId: "124296576459",
+  appId: "1:124296576459:web:352ce05be6ab7ad40a4a4e"
 };
 
 // Inicijalizuj Firebase
@@ -754,16 +754,124 @@ class FirebaseService {
     await this.init();
     
     const lowerEmail = email.toLowerCase();
+    console.log(`Pokušaj registracije: ${name} (${lowerEmail}) za zbor ID: ${assemblyId}`);
     
-    // Find assembly
-    const assembly = await this.getAssemblyById(assemblyId);
+    // Find assembly or related community
+    let assembly = await this.getAssemblyById(assemblyId);
+    let communityName = '';
+    let communityId = '';
+    
+    // Ako zbor nije pronađen, pokušaćemo da kreiramo virtuelni zbor na osnovu ID-a zajednice
     if (!assembly) {
-      throw new Error('Zbor nije pronađen.');
+      // Pretpostavimo da je assemblyId zapravo ID zajednice ili sadrži ID zajednice
+      const possibleCommunityId = assemblyId.replace('assembly_', '');
+      const community = localCommunities.find(c => c.id === possibleCommunityId);
+      
+      if (community) {
+        communityName = community.name;
+        communityId = community.id;
+        
+        // Kreiraj virtuelni assembly objekat
+        assembly = {
+          id: `assembly_${Date.now()}`,
+          localCommunityId: communityId,
+          localCommunityName: communityName,
+          date: '',
+          time: '',
+          address: community.address,
+          description: `Zbor građana u mesnoj zajednici ${communityName}`,
+          status: 'never-scheduled',
+          signatureCount: 0
+        };
+        
+        // Dodaj ga u lokalnu listu i Firestore ako je moguće
+        this.assemblies.push(assembly);
+        
+        if (!this.useLocalData) {
+          try {
+            const assembliesRef = collection(db, 'assemblies');
+            await setDoc(doc(assembliesRef, assembly.id), assembly);
+          } catch (error) {
+            console.error('Error creating virtual assembly:', error);
+            this.useLocalData = true;
+          }
+        }
+      } else {
+        // Ako ne možemo naći zajednicu, pokušaj direktno locirati zajednicu iz ID-a
+        for (const community of localCommunities) {
+          if (assemblyId.includes(community.id)) {
+            communityName = community.name;
+            communityId = community.id;
+            
+            // Kreiraj virtuelni assembly
+            assembly = {
+              id: `assembly_${Date.now()}`,
+              localCommunityId: communityId,
+              localCommunityName: communityName,
+              date: '',
+              time: '',
+              address: community.address,
+              description: `Zbor građana u mesnoj zajednici ${communityName}`,
+              status: 'never-scheduled',
+              signatureCount: 0
+            };
+            
+            this.assemblies.push(assembly);
+            
+            if (!this.useLocalData) {
+              try {
+                const assembliesRef = collection(db, 'assemblies');
+                await setDoc(doc(assembliesRef, assembly.id), assembly);
+              } catch (error) {
+                console.error('Error creating virtual assembly:', error);
+                this.useLocalData = true;
+              }
+            }
+            break;
+          }
+        }
+      }
     }
+    
+    // Ako je assembly i dalje undefined, koristi default vrednost
+    if (!assembly) {
+      const defaultCommunity = localCommunities[0];
+      communityName = defaultCommunity.name;
+      communityId = defaultCommunity.id;
+      
+      assembly = {
+        id: `assembly_${Date.now()}`,
+        localCommunityId: communityId,
+        localCommunityName: communityName,
+        date: '',
+        time: '',
+        address: defaultCommunity.address,
+        description: `Zbor građana u mesnoj zajednici ${communityName}`,
+        status: 'never-scheduled',
+        signatureCount: 0
+      };
+      
+      console.log('Kreiran podrazumevani zbor jer nije pronađen nijedan postojeći.');
+      
+      this.assemblies.push(assembly);
+      
+      if (!this.useLocalData) {
+        try {
+          const assembliesRef = collection(db, 'assemblies');
+          await setDoc(doc(assembliesRef, assembly.id), assembly);
+        } catch (error) {
+          console.error('Error creating default assembly:', error);
+          this.useLocalData = true;
+        }
+      }
+    }
+    
+    console.log(`Zbor pronađen/kreiran: ${assembly.localCommunityName}, trenutni broj potpisa: ${assembly.signatureCount}`);
     
     // Check if email is already registered
     const isRegistered = await this.isEmailRegistered(lowerEmail, assembly.localCommunityName);
     if (isRegistered) {
+      console.log(`Email ${lowerEmail} je već registrovan za ovaj zbor.`);
       throw new Error(`Email ${email} je već registrovan za ovaj zbor.`);
     }
     
@@ -782,13 +890,17 @@ class FirebaseService {
         
         // Update assembly signature count
         const newSignatureCount = assembly.signatureCount + 1;
-        await this.updateAssembly(assemblyId, { 
+        console.log(`Povećan broj potpisa na: ${newSignatureCount}`);
+        
+        const newStatus = newSignatureCount >= SIGNATURE_THRESHOLD ? 'confirmed' : assembly.status;
+        await this.updateAssembly(assembly.id, { 
           signatureCount: newSignatureCount,
-          status: newSignatureCount >= SIGNATURE_THRESHOLD ? 'confirmed' : assembly.status
+          status: newStatus
         });
         
         // Send confirmation emails if threshold reached
         if (newSignatureCount >= SIGNATURE_THRESHOLD && assembly.status !== 'confirmed') {
+          console.log(`🎉 DOSTIGNUTO ${SIGNATURE_THRESHOLD} POTPISA! Pokrećem slanje mejlova svim potpisnicima...`);
           await this.sendConfirmationEmails(assembly.localCommunityName);
         }
       } catch (error) {
@@ -808,67 +920,242 @@ class FirebaseService {
     });
     
     // Update local assembly data
-    const assemblyIndex = this.assemblies.findIndex(a => a.id === assemblyId);
+    const assemblyIndex = this.assemblies.findIndex(a => a.id === assembly.id);
     if (assemblyIndex !== -1) {
       const newSignatureCount = this.assemblies[assemblyIndex].signatureCount + 1;
+      console.log(`Lokalno: Povećan broj potpisa na: ${newSignatureCount}`);
+      
+      const oldStatus = this.assemblies[assemblyIndex].status;
+      const newStatus = newSignatureCount >= SIGNATURE_THRESHOLD ? 'confirmed' : oldStatus;
+      
       this.assemblies[assemblyIndex] = {
         ...this.assemblies[assemblyIndex],
         signatureCount: newSignatureCount,
-        status: newSignatureCount >= SIGNATURE_THRESHOLD ? 'confirmed' : this.assemblies[assemblyIndex].status
+        status: newStatus
       };
       
       // Send confirmation emails if threshold reached (local mock)
-      if (newSignatureCount >= SIGNATURE_THRESHOLD && this.assemblies[assemblyIndex].status !== 'confirmed') {
+      if (newSignatureCount >= SIGNATURE_THRESHOLD && oldStatus !== 'confirmed') {
+        console.log(`🎉 LOKALNO: DOSTIGNUTO ${SIGNATURE_THRESHOLD} POTPISA! Pokrećem slanje mejlova svim potpisnicima...`);
         await this.sendConfirmationEmails(this.assemblies[assemblyIndex].localCommunityName);
       }
     }
+    
+    console.log(`Registracija uspešna za: ${name} (${lowerEmail})`);
   }
 
-  // Pošalji email-ove za potvrdu kada je dostignut prag
-  private async sendConfirmationEmails(communityName: string): Promise<void> {
-    // U pravoj aplikaciji, ovo bi slalo stvarne email-ove
-    // Za sada samo logujemo
-    console.log(`Sending confirmation emails to attendees of ${communityName}`);
+  // Nova metoda za testiranje slanja mejla
+  async testSendEmail(toEmail: string, toName: string): Promise<boolean> {
+    console.log(`Testiranje slanja mejla na: ${toEmail}`);
     
-    // Example implementation with EmailJS:
-    /*
-    import emailjs from 'emailjs-com';
-    
-    // Get all registrations for this community
-    const registrationsRef = collection(db, 'registrations');
-    const q = query(registrationsRef, where('communityName', '==', communityName));
-    const querySnapshot = await getDocs(q);
-    
-    // Get assembly details
-    const assembly = this.assemblies.find(a => a.localCommunityName === communityName);
-    
-    if (!assembly) return;
-    
-    // Send email to each attendee
-    querySnapshot.forEach(doc => {
-      const registration = doc.data();
+    try {
+      const apiKey = import.meta.env.VITE_BREVO_API_KEY;
       
-      emailjs.send(
-        'YOUR_SERVICE_ID',
-        'YOUR_TEMPLATE_ID',
+      if (!apiKey) {
+        console.error('Brevo API ključ nije pronađen u .env fajlu!');
+        return false;
+      }
+      
+      console.log('Brevo API ključ je pronađen, pokušavam slanje...');
+      
+      // Definišemo adresu pošiljaoca - ovo mora biti verifikovana adresa u Brevo sistemu
+      const senderEmail = 'noreply.gradjanskifront@gmail.com'; // Verifikovana adresa u Brevo
+      const senderName = 'Građanski Front';
+      
+      const response = await axios.post(
+        'https://api.brevo.com/v3/smtp/email',
         {
-          to_email: registration.email,
-          to_name: registration.name,
-          assembly_date: assembly.date,
-          assembly_time: assembly.time,
-          assembly_location: assembly.address,
-          contact_phone: assembly.contactPhone
+          sender: {
+            name: senderName,
+            email: senderEmail
+          },
+          to: [
+            {
+              email: toEmail,
+              name: toName || toEmail
+            }
+          ],
+          subject: 'Test email od Građanskog Fronta',
+          htmlContent: `
+            <html>
+              <head></head>
+              <body>
+                <h1>Zdravo ${toName || 'korisniče'}!</h1>
+                <p>Ovo je testni email za proveru funkcionisanja sistema za slanje mejlova.</p>
+                <p>Ako vidite ovaj mejl, znači da je sistem uspešno podešen.</p>
+                <p><strong>Građanski Front</strong></p>
+              </body>
+            </html>
+          `
         },
-        'YOUR_USER_ID'
-      )
-      .then(response => {
-        console.log('Email sent successfully:', response);
-      })
-      .catch(error => {
-        console.error('Error sending email:', error);
-      });
-    });
-    */
+        {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'api-key': apiKey
+          }
+        }
+      );
+      
+      console.log('Odgovor servera:', response.status, response.statusText);
+      console.log('Mejl uspešno poslat!', response.data);
+      return true;
+    } catch (error) {
+      console.error('Greška pri slanju mejla:');
+      if (axios.isAxiosError(error)) {
+        console.error('Status:', error.response?.status);
+        console.error('Poruka:', error.response?.data);
+        console.error('Detalji:', error.message);
+      } else {
+        console.error(error);
+      }
+      return false;
+    }
+  }
+
+  // Poboljšana metoda za slanje potvrda
+  private async sendConfirmationEmails(communityName: string): Promise<void> {
+    try {
+      console.log(`📧 SLANJE MEJLOVA: Priprema za slanje mejlova potpisnicima za zajednicu: ${communityName}`);
+      
+      // Učitaj sve registracije za ovu zajednicu
+      const registrationsSnapshot = await getDocs(
+        query(
+          collection(db, 'registrations'), 
+          where('communityName', '==', communityName)
+        )
+      );
+      
+      // Ako nema registracija, prekini
+      if (registrationsSnapshot.empty) {
+        console.log('Nema registracija za slanje mejlova');
+        return;
+      }
+      
+      const registrations = registrationsSnapshot.docs.map(doc => doc.data() as Registration);
+      const emails = registrations.map(reg => ({
+        email: reg.email,
+        name: reg.name
+      }));
+      
+      console.log(`Pronađeno ${emails.length} email adresa za slanje obaveštenja`);
+      
+      // Pronađi assembly za ovu zajednicu da bismo dobili detalje
+      const assembly = await this.getAssemblyByLocalCommunityName(communityName);
+      
+      if (!assembly) {
+        console.log('Ne mogu pronaći zbor za ovu zajednicu');
+        return;
+      }
+
+      const apiKey = import.meta.env.VITE_BREVO_API_KEY;
+      
+      if (!apiKey) {
+        console.error('Brevo API ključ nije pronađen u .env fajlu!');
+        return;
+      }
+      
+      // Verifikovana adresa pošiljaoca iz Brevo sistema
+      const senderEmail = 'noreply.gradjanskifront@gmail.com'; // Verifikovana adresa u Brevo
+      const senderName = 'Građanski Front';
+      
+      // Kreiraj sadržaj mejla sa relevantnim informacijama
+      const subject = `Potvrđen zbor građana u zajednici ${communityName}`;
+      const htmlContent = `
+        <html>
+          <head></head>
+          <body>
+            <h1>Potvrđen zbor građana u zajednici ${communityName}</h1>
+            <p>Poštovani/a,</p>
+            <p>Obaveštavamo vas da je zbor građana u mesnoj zajednici <strong>${communityName}</strong> potvrđen!</p>
+            <p><strong>Detalji zbora:</strong></p>
+            <ul>
+              <li>Datum: ${assembly.date}</li>
+              <li>Vreme: ${assembly.time}</li>
+              <li>Adresa: ${assembly.address}</li>
+              <li>Opis: ${assembly.description || 'Razgovor o lokalnim problemima i inicijativama'}</li>
+            </ul>
+            <p>Vaše prisustvo je važno za rešavanje problema naše lokalne zajednice.</p>
+            <p>Hvala na podršci!</p>
+            <p><strong>Građanski Front</strong></p>
+          </body>
+        </html>
+      `;
+      
+      console.log('Šaljem mejlove na adrese:', emails.map(e => e.email).join(', '));
+      
+      // Grupišemo primatelje u bulkove od po 20 adresa (Brevo ograničenje)
+      const emailChunks = [];
+      for (let i = 0; i < emails.length; i += 20) {
+        emailChunks.push(emails.slice(i, i + 20));
+      }
+      
+      let successCount = 0;
+      
+      for (const chunk of emailChunks) {
+        try {
+          const response = await axios.post(
+            'https://api.brevo.com/v3/smtp/email',
+            {
+              sender: {
+                name: senderName,
+                email: senderEmail
+              },
+              to: chunk.map(recipient => ({
+                email: recipient.email,
+                name: recipient.name || recipient.email
+              })),
+              subject: subject,
+              htmlContent: htmlContent
+            },
+            {
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'api-key': apiKey
+              }
+            }
+          );
+          
+          console.log(`Paket mejlova uspešno poslat (${chunk.length} adresa), status:`, response.status);
+          successCount += chunk.length;
+        } catch (error) {
+          console.error('Greška pri slanju paketa mejlova:');
+          if (axios.isAxiosError(error)) {
+            console.error('Status:', error.response?.status);
+            console.error('Poruka:', error.response?.data);
+          } else {
+            console.error(error);
+          }
+        }
+      }
+      
+      console.log(`Uspešno poslato ${successCount} od ${emails.length} mejlova.`);
+
+    } catch (error) {
+      console.error('Greška pri slanju mejlova:', error);
+    }
+  }
+
+  // Dodajemo pomoćnu metodu za dohvatanje assembly po imenu zajednice
+  async getAssemblyByLocalCommunityName(localCommunityName: string): Promise<Assembly | undefined> {
+    try {
+      const assembliesSnapshot = await getDocs(
+        query(
+          collection(db, 'assemblies'),
+          where('localCommunityName', '==', localCommunityName)
+        )
+      );
+      
+      if (assembliesSnapshot.empty) {
+        return undefined;
+      }
+      
+      return convertDocToAssembly(assembliesSnapshot.docs[0]);
+    } catch (error) {
+      console.error('Greška pri dohvatanju zbora po imenu zajednice:', error);
+      return undefined;
+    }
   }
 }
 

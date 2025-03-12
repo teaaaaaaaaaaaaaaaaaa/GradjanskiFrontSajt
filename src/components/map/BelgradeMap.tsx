@@ -89,15 +89,26 @@ function BelgradeMap({
   const [showScheduleForm, setShowScheduleForm] = useState<string | null>(null);
   const [showRegistrationForm, setShowRegistrationForm] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
+  const [localSelectedCommunity, setLocalSelectedCommunity] = useState<string | null>(selectedCommunity);
 
   useEffect(() => {
     if (selectedCommunity) {
+      setLocalSelectedCommunity(selectedCommunity);
       const community = localCommunities.find(c => c.id === selectedCommunity);
       if (community) {
         setCenter([community.coordinates.lat, community.coordinates.lng]);
       }
     }
   }, [selectedCommunity]);
+
+  useEffect(() => {
+    if (localSelectedCommunity) {
+      const community = localCommunities.find(c => c.id === localSelectedCommunity);
+      if (community) {
+        setCenter([community.coordinates.lat, community.coordinates.lng]);
+      }
+    }
+  }, [localSelectedCommunity]);
 
   const handleCloseForm = () => {
     setShowScheduleForm(null);
@@ -117,6 +128,7 @@ function BelgradeMap({
 
   const handleShowScheduleForm = (e: React.MouseEvent, communityId: string) => {
     e.stopPropagation();
+    setLocalSelectedCommunity(communityId);
     setShowScheduleForm(communityId);
     setShowRegistrationForm(null);
     setFormError(null);
@@ -161,6 +173,21 @@ function BelgradeMap({
           </div>
         </div>
         
+        {/* Map Legend */}
+        <div className="absolute bottom-4 left-4 bg-background p-4 rounded-md shadow-md">
+          <h3 className="text-sm font-medium mb-2">Legenda</h3>
+          <div className="space-y-2">
+            <div className="flex items-center">
+              <div className="h-4 w-4 rounded-full bg-red-500 mr-2"></div>
+              <span className="text-xs">Zbor nije zakazan</span>
+            </div>
+            <div className="flex items-center">
+              <div className="h-4 w-4 rounded-full bg-red-600 mr-2"></div>
+              <span className="text-xs">Zbor je zakazan</span>
+            </div>
+          </div>
+        </div>
+        
         <MapCenter center={center} />
         
         {localCommunities.map((community) => {
@@ -178,12 +205,6 @@ function BelgradeMap({
             >
               <Popup className="custom-popup">
                 <div className="popup-content">
-                  <button 
-                    className="absolute right-2 top-2 text-gray-500 hover:text-gray-700"
-                    onClick={handleCloseForm}
-                  >
-                    <X size={20} />
-                  </button>
                   <h3 className="popup-title">{community.name}</h3>
                   <div className="popup-info">
                     <p><strong>Adresa:</strong> {community.address}</p>
@@ -191,8 +212,6 @@ function BelgradeMap({
                     {assembly && (
                       <>
                         <p><strong>Status:</strong> {assembly.status === 'confirmed' ? 'Potvrđen' : 'Zakazan'}</p>
-                        <p><strong>Datum:</strong> {assembly.date}</p>
-                        <p><strong>Vreme:</strong> {assembly.time}</p>
                         <p><strong>Broj potpisa:</strong> {assembly.signatureCount}</p>
                       </>
                     )}
@@ -223,15 +242,6 @@ function BelgradeMap({
         {showScheduleForm && (
           <div className="calendar-popup">
             <div className="calendar-popup-content">
-              <div className="calendar-popup-header">
-                <h3>Zakaži zbor</h3>
-                <button 
-                  className="calendar-popup-close"
-                  onClick={handleCloseForm}
-                >
-                  <X size={24} />
-                </button>
-              </div>
               <InitiativeForm
                 localCommunityId={showScheduleForm}
                 onSubmit={async (data) => {
@@ -248,16 +258,14 @@ function BelgradeMap({
                     );
                     handleCloseForm();
                   } catch (err) {
-                    setFormError(err instanceof Error ? err.message : 'Došlo je do greške');
+                    const errorMessage = err instanceof Error ? err.message : 'Došlo je do greške';
+                    setFormError(errorMessage);
+                    // Don't close form on error
                   }
                 }}
+                onClose={handleCloseForm}
+                formError={formError}
               />
-              {formError && (
-                <div className="form-error">
-                  <AlertCircle className="form-error-icon" size={16} />
-                  <span className="form-error-message">{formError}</span>
-                </div>
-              )}
             </div>
           </div>
         )}
@@ -275,10 +283,20 @@ function BelgradeMap({
                 </button>
               </div>
               <AssemblyRegistrationForm
-                assembly={assemblies.find(a => a.id === showRegistrationForm)!}
+                assembly={assemblies.find(a => a.id === showRegistrationForm) || {
+                  id: showRegistrationForm || '',
+                  localCommunityId: localSelectedCommunity || '',
+                  localCommunityName: localCommunities.find(c => c.id === localSelectedCommunity)?.name || '',
+                  address: localCommunities.find(c => c.id === localSelectedCommunity)?.address || '',
+                  description: '',
+                  status: 'scheduled',
+                  signatureCount: 0,
+                  date: '',
+                  time: ''
+                }}
                 onRegister={async (email, name) => {
                   try {
-                    await onRegisterAttendee(email, name, showRegistrationForm);
+                    await onRegisterAttendee(email, name, showRegistrationForm || '');
                     handleCloseForm();
                   } catch (err) {
                     setFormError(err instanceof Error ? err.message : 'Došlo je do greške');

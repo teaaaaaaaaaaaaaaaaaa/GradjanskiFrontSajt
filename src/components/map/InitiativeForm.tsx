@@ -20,17 +20,18 @@ interface InitiativeFormProps {
   localCommunityId: string;
   onSubmit: (data: InitiativeFormData) => Promise<void>;
   onClose?: () => void;
+  formError?: string | null;
 }
 
-const InitiativeForm = ({ localCommunityId, onSubmit, onClose }: InitiativeFormProps) => {
+const InitiativeForm = ({ localCommunityId, onSubmit, onClose, formError: externalError }: InitiativeFormProps) => {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [isResident, setIsResident] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [status, setStatus] = useState<{ type: 'error' | 'success' | null; message: string | null }>({
-    type: null,
-    message: null
-  });
+  const [internalError, setInternalError] = useState<string | null>(null);
+
+  // Use either internal or external error
+  const error = internalError || externalError;
 
   const community = localCommunities.find(c => c.id === localCommunityId);
 
@@ -38,28 +39,28 @@ const InitiativeForm = ({ localCommunityId, onSubmit, onClose }: InitiativeFormP
     e.preventDefault();
     
     if (!community) {
-      setStatus({ type: 'error', message: 'Mesna zajednica nije pronađena.' });
+      setInternalError('Mesna zajednica nije pronađena.');
       return;
     }
     
     if (!isResident) {
-      setStatus({ type: 'error', message: 'Morate potvrditi da ste stanovnik ove mesne zajednice.' });
+      setInternalError('Morate potvrditi da ste stanovnik ove mesne zajednice.');
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setStatus({ type: 'error', message: 'Molimo unesite ispravnu email adresu.' });
+      setInternalError('Molimo unesite ispravnu email adresu.');
       return;
     }
     
     setIsSubmitting(true);
-    setStatus({ type: null, message: null });
+    setInternalError(null);
     
     try {
       const isDuplicateEmail = await FirebaseService.isEmailRegistered(email, community.name);
       if (isDuplicateEmail) {
-        setStatus({ type: 'error', message: 'Već ste registrovani sa ovom email adresom.' });
+        setInternalError('Već ste registrovani sa ovom email adresom.');
         setIsSubmitting(false);
         return;
       }
@@ -78,21 +79,10 @@ const InitiativeForm = ({ localCommunityId, onSubmit, onClose }: InitiativeFormP
         isResident
       });
       
-      setStatus({ type: 'success', message: 'Uspešno ste se prijavili!' });
-      setEmail('');
-      setName('');
-      setIsResident(false);
-      
-      // Automatically close form after success
-      setTimeout(() => {
-        onClose?.();
-      }, 2000);
+      // Form will be closed by parent component on success
       
     } catch (err) {
-      setStatus({ 
-        type: 'error', 
-        message: err instanceof Error ? err.message : 'Došlo je do greške prilikom prijave.' 
-      });
+      setInternalError(err instanceof Error ? err.message : 'Došlo je do greške prilikom prijave.');
     } finally {
       setIsSubmitting(false);
     }
@@ -100,24 +90,18 @@ const InitiativeForm = ({ localCommunityId, onSubmit, onClose }: InitiativeFormP
 
   return (
     <div className="bg-white rounded-lg shadow-lg max-w-md w-full mx-auto p-6" style={{ maxHeight: '100vh' }}>
-      {status.message && (
-        <div className={`mb-6 p-3 rounded-md text-sm ${
-          status.type === 'error' 
-            ? 'bg-red-50 border border-red-200 text-red-700' 
-            : 'bg-green-50 border border-green-200 text-green-700'
-        }`}>
-          {status.message}
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-xl font-semibold text-gray-800">Zakaži zbor</h3>
+        <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          <X size={20} />
+        </button>
+      </div>
+
+      {error && (
+        <div className="mb-6 p-3 rounded-md text-sm bg-red-50 border border-red-200 text-red-700">
+          {error}
         </div>
       )}
-      
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold text-gray-800">Prijava za zbor</h3>
-        {onClose && (
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-            <X size={20} />
-          </button>
-        )}
-      </div>
       
       <div className="mb-4">
         <p className="text-sm text-gray-600">
@@ -128,10 +112,10 @@ const InitiativeForm = ({ localCommunityId, onSubmit, onClose }: InitiativeFormP
         </p>
       </div>
       
-      <form onSubmit={handleSubmit} className="space-y-3">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-            Ime i prezime *
+            Ime i prezime <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -145,7 +129,7 @@ const InitiativeForm = ({ localCommunityId, onSubmit, onClose }: InitiativeFormP
         
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-            Email adresa *
+            Email adresa <span className="text-red-500">*</span>
           </label>
           <input
             type="email"
@@ -155,6 +139,9 @@ const InitiativeForm = ({ localCommunityId, onSubmit, onClose }: InitiativeFormP
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+          <p className="text-xs text-gray-500 mt-1">
+            Na ovu adresu ćete dobiti obaveštenje kada zbor bude potvrđen.
+          </p>
         </div>
         
         <div className="flex items-start">
@@ -167,13 +154,13 @@ const InitiativeForm = ({ localCommunityId, onSubmit, onClose }: InitiativeFormP
             required
           />
           <label htmlFor="isResident" className="ml-2 block text-sm text-gray-600">
-            Potvrđujem da sam stanovnik ove mesne zajednice *
+            Potvrđujem da sam stanovnik ove mesne zajednice <span className="text-red-500">*</span>
           </label>
         </div>
         
         <button
           type="submit"
-          className="w-full px-4 py-2 bg-red-600 text-white rounded-md font-medium hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+          className="w-full px-4 py-3 bg-red-600 text-white rounded-md font-medium hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-4"
           disabled={isSubmitting}
         >
           {isSubmitting ? (
@@ -182,7 +169,7 @@ const InitiativeForm = ({ localCommunityId, onSubmit, onClose }: InitiativeFormP
               <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : (
-            'Prijavi se'
+            'Zakaži zbor'
           )}
         </button>
       </form>

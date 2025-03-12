@@ -1,79 +1,66 @@
-# Građanski Front Website
+# Građanski Front Sajt
 
-A modern, responsive web platform for "Građanski Front" that enables citizens to organize through working groups, plenums, and assemblies.
+Web aplikacija za organizovanje građanskih zborova i inicijativa po mesnim zajednicama.
 
-## Features
+## Funkcionalnosti
 
-- **Working Groups**: Join or create working groups based on your interests and skills
-- **Interactive Map**: Find nearby assemblies, plenums, and activities in your area
-- **Assemblies and Plenums**: Participate in decision-making and organizing actions
-- **Notifications**: Stay updated with the latest activities and events
+- Interaktivna mapa mesnih zajednica
+- Zakazivanje zborova građana
+- Potpisivanje peticija
+- Automatsko slanje email obaveštenja kada se dostigne dovoljan broj potpisa
+- Pregled zakazanih zborova
 
-## Tech Stack
+## Tehnologije
 
-- **Frontend**: React, TypeScript, Tailwind CSS
-- **Routing**: React Router
-- **Icons**: Lucide React
-- **Build Tool**: Vite
+- React
+- TypeScript
+- Vite
+- Firebase (Firestore)
+- Brevo API za slanje mejlova
+- Tailwind CSS
 
-## Getting Started
+## Instalacija
 
-### Prerequisites
+1. Klonirajte repozitorijum:
 
-- Node.js (v14 or higher)
-- npm or yarn
-
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/gradjanski-front-sajt.git
-   cd gradjanski-front-sajt
+   ```
+   git clone [url-repozitorijuma]
+   cd GradjanskiFrontSajt
    ```
 
-2. Install dependencies:
-   ```bash
+2. Instalirajte zavisnosti:
+
+   ```
    npm install
-   # or
-   yarn install
    ```
 
-3. Start the development server:
-   ```bash
+3. Kopirajte `.env.example` u `.env` i postavite stvarne vrednosti:
+
+   ```
+   cp .env.example .env
+   ```
+
+4. Pokrenite razvojni server:
+   ```
    npm run dev
-   # or
-   yarn dev
    ```
 
-4. Open your browser and navigate to `http://localhost:5173`
+## Konfiguracija
 
-## Project Structure
+Za slanje mejlova potrebno je:
+
+1. Kreirati nalog na [Brevo](https://www.brevo.com/)
+2. Verifikovati email adresu pošiljaoca
+3. Generisati API ključ i postaviti ga u `.env` fajl
+
+## Deployment
+
+Za produkcijsko okruženje:
 
 ```
-src/
-├── components/     # Reusable UI components
-│   ├── layout/     # Layout components (Navbar, Footer)
-│   └── theme/      # Theme-related components
-├── pages/          # Page components
-├── assets/         # Static assets
-├── App.tsx         # Main application component
-├── main.tsx        # Entry point
-└── index.css       # Global styles
+npm run build
 ```
 
-## Contributing
+## Licenca
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- Inspired by the need for better citizen organization and participation
-- Built with modern web technologies for optimal performance and user experience
+[MIT](https://choosealicense.com/licenses/mit/)
