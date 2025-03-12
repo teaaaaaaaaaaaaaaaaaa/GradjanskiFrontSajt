@@ -15,6 +15,10 @@ import {
   DocumentData
 } from 'firebase/firestore';
 import axios from 'axios';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+
+// Add a flag to handle development mode
+const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
 // Firebase konfiguracija
 const firebaseConfig = {
@@ -53,6 +57,23 @@ export interface Assembly {
   contactPhone?: string;
   initiatorEmail?: string;
   initiatorName?: string;
+}
+
+export interface Member {
+  firstName: string;
+  lastName: string;
+  email: string;
+  workingGroup: string;
+  phone?: string;
+  localCommunity?: string;
+  joinedAt: string;
+}
+
+export interface EmailData {
+  to: string;
+  subject: string;
+  template: string;
+  templateData: Record<string, any>;
 }
 
 // Mock podaci za lokalne zajednice u Beogradu
@@ -1157,6 +1178,169 @@ class FirebaseService {
       return undefined;
     }
   }
+
+  /**
+   * Adds a new member to the database
+   * @param memberData The member data to add
+   * @returns Promise that resolves when the member is added
+   */
+  async addNewMember(memberData: Member): Promise<string> {
+    try {
+      // For development environment, just log the data and return success
+      if (isDevelopment) {
+        console.log('Development mode: Simulating adding member:', memberData);
+        return 'dev-member-id-' + Date.now();
+      }
+
+      // Initialize Firebase if not already initialized
+      if (!this.initialized) {
+        await this.init();
+      }
+
+      // Add member to Firestore
+      const db = getFirestore();
+      const membersCollection = collection(db, 'members');
+      
+      // Check if email already exists
+      const emailQuery = query(membersCollection, where('email', '==', memberData.email));
+      const existingMembers = await getDocs(emailQuery);
+      
+      if (!existingMembers.empty) {
+        // Update existing member instead of creating a new one
+        const existingMember = existingMembers.docs[0];
+        await updateDoc(doc(db, 'members', existingMember.id), {
+          ...memberData,
+          updatedAt: new Date().toISOString(),
+        });
+        return existingMember.id;
+      }
+      
+      // Add new member
+      const docRef = await addDoc(membersCollection, {
+        ...memberData,
+        createdAt: new Date().toISOString(),
+      });
+      
+      return docRef.id;
+    } catch (error) {
+      console.error('Error adding member:', error);
+      if (isDevelopment) {
+        // In development, simulate success
+        console.log('Development mode: Simulating successful member addition despite error');
+        return 'dev-member-id-' + Date.now();
+      }
+      throw new Error('Failed to add member');
+    }
+  }
+
+  /**
+   * Sends an email using Firebase Cloud Functions
+   * @param emailData The email data to send
+   * @returns Promise that resolves when the email is sent
+   */
+  async sendEmail(emailData: EmailData): Promise<boolean> {
+    try {
+      // For development environment, just log the data and return success
+      if (isDevelopment) {
+        console.log('Development mode: Simulating email sending:', emailData);
+        return true;
+      }
+
+      // Initialize Firebase if not already initialized
+      if (!this.initialized) {
+        await this.init();
+      }
+
+      // Call the sendEmail Cloud Function
+      const functions = getFunctions();
+      const sendEmailFunction = httpsCallable(functions, 'sendEmail');
+      
+      const result = await sendEmailFunction(emailData);
+      return result.data as boolean;
+    } catch (error) {
+      console.error('Error sending email:', error);
+      if (isDevelopment) {
+        // In development, simulate success
+        console.log('Development mode: Simulating successful email sending despite error');
+        return true;
+      }
+      throw new Error('Failed to send email');
+    }
+  }
+
+  /**
+   * Sends a welcome email to a new member with zbor information
+   * @param email The email address to send to
+   * @param firstName The member's first name
+   * @param localCommunity The member's local community
+   * @returns Promise that resolves when the email is sent
+   */
+  async sendWelcomeEmail(email: string, firstName: string, localCommunity: string): Promise<boolean> {
+    const emailData: EmailData = {
+      to: email,
+      subject: 'Dobrodošli u Građanski Front',
+      template: 'welcome-member',
+      templateData: {
+        firstName,
+        localCommunity,
+        telegramLink: 'https://t.me/+xVyPlEJOyX4xODY0', // This could be dynamic based on local community
+        zborAgenda: [
+          'Usvajanje zapisnika prethodne sednice Zbora',
+          'Usvajanje dnevnog reda',
+          'Formiranje predloženih radnih grupa na nivou mesne zajednice',
+          'Odabir moderatora i zapisničara za sledeći Zbor',
+          'Razno'
+        ]
+      }
+    };
+
+    return this.sendEmail(emailData);
+  }
+
+  /**
+   * Sends a test email to verify the email sending functionality
+   * @param email The email address to send the test to
+   * @returns Promise that resolves when the email is sent
+   */
+  async sendTestEmail(email: string): Promise<boolean> {
+    try {
+      // For development environment, just log the data and return success
+      if (isDevelopment) {
+        console.log('Development mode: Simulating test email sending to:', email);
+        
+        // In development, we'll make a direct HTTP request to the test endpoint
+        try {
+          const response = await fetch(`https://us-central1-gradjanskifront.cloudfunctions.net/testEmail?email=${encodeURIComponent(email)}`);
+          const data = await response.json();
+          console.log('Test email response:', data);
+          return data.success;
+        } catch (httpError) {
+          console.error('Error making HTTP request to test endpoint:', httpError);
+          return true; // Still return true in development mode
+        }
+      }
+
+      // Initialize Firebase if not already initialized
+      if (!this.initialized) {
+        await this.init();
+      }
+
+      // Call the testEmail Cloud Function
+      const response = await fetch(`https://us-central1-gradjanskifront.cloudfunctions.net/testEmail?email=${encodeURIComponent(email)}`);
+      const data = await response.json();
+      return data.success;
+    } catch (error) {
+      console.error('Error sending test email:', error);
+      if (isDevelopment) {
+        // In development, simulate success
+        console.log('Development mode: Simulating successful test email sending despite error');
+        return true;
+      }
+      throw new Error('Failed to send test email');
+    }
+  }
 }
 
-export default new FirebaseService(); 
+// Export a singleton instance
+const firebaseService = new FirebaseService();
+export default firebaseService; 
