@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Search, Filter, Calendar, MapPin, Users, Info } from 'lucide-react'
+import { Search, Filter, Calendar, MapPin, Users, Info, AlertCircle, X } from 'lucide-react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
 import BelgradeMap from '../components/map/BelgradeMap'
@@ -156,10 +156,11 @@ function MapaPage() {
 
   // Handle marker click on the map
   const handleMarkerClick = (localCommunityId: string) => {
-    setSelectedCommunity(localCommunityId)
+    // TODO: Implement marker click handling
+    console.log('Marker clicked:', localCommunityId)
   }
 
-  // Handle opening the petition form
+  // Handle opening the petition form 
   const handleRegisterAttendee = async (assemblyId: string) => {
     // Reset form fields
     setUserEmail('')
@@ -598,11 +599,12 @@ function MapaPage() {
                 
                 {formError && (
                   <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 text-destructive rounded-md flex items-start">
-                    <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5">
+                      <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clipRule="evenodd" />
+                    </svg>
                     <p className="text-sm">{formError}</p>
                   </div>
                 )}
-                
                 <div className="space-y-4 mb-4">
                   <div>
                     <label htmlFor="petition-name" className="block text-sm font-medium mb-1">
