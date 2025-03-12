@@ -30,23 +30,14 @@ function RadneGrupe() {
       category: 'komunikacija',
       members: 56,
       icon: <MessageCircle className="h-10 w-10 text-white" />,
-    },
-    {
-      id: 4,
-      name: 'GRG za medije i promociju (GRGM)',
-      description: 'Kreira sadržaj za društvene mreže, kontaktira medije i širi informacije o aktivnostima Građanskog Fronta.',
-      category: 'mediji',
-      members: 31,
-      icon: <Megaphone className="h-10 w-10 text-white" />,
-    },
+    }
   ]
 
   const categories = [
     { id: 'sve', name: 'Sve grupe' },
     { id: 'logistika', name: 'Logistika' },
     { id: 'bezbednost', name: 'Bezbednost' },
-    { id: 'komunikacija', name: 'Komunikacija' },
-    { id: 'mediji', name: 'Mediji' },
+    { id: 'komunikacija', name: 'Komunikacija' }
   ]
 
   const filteredGrupe = radneGrupe.filter((grupa) => {
@@ -57,7 +48,7 @@ function RadneGrupe() {
   })
 
   return (
-    <div className="bg-white">
+    <div className="bg-primary pt-32">
       {/* Hero Section */}
       <section className="bg-primary py-16 text-white">
         <div className="container mx-auto px-6">
@@ -132,43 +123,19 @@ function RadneGrupe() {
         </div>
       </section>
 
-      {/* Groups Section */}
-      <section id="grupe" className="py-16 bg-gray-50">
+      {/* Working Groups List Section */}
+      <section id="grupe-lista" className="py-16 bg-white">
         <div className="container mx-auto px-6">
-          <h2 className="text-3xl md:text-4xl font-anton mb-8 text-center">
-            PRIDRUŽI SE GRAĐANSKOJ RADNOJ GRUPI
-          </h2>
-          
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-anton mb-4">RADNE GRUPE</h2>
+            <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
+              Pridružite se nekoj od naših radnih grupa i doprinesite svojim znanjem i iskustvom.
+            </p>
+          </div>
+
           <div className="max-w-4xl mx-auto mb-12">
             <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-              <div className="flex flex-col md:flex-row gap-4 mb-6">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Pretraži radne grupe..."
-                    className="gf-input pl-10"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-                <div className="flex-1">
-                  <div className="relative">
-                    <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    <select
-                      className="gf-input pl-10 appearance-none"
-                      value={selectedCategory || 'sve'}
-                      onChange={(e) => setSelectedCategory(e.target.value)}
-                    >
-                      {categories.map((category) => (
-                        <option key={category.id} value={category.id}>
-                          {category.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              </div>
+              {/* Removed search and filter inputs */}
             </div>
 
             <div className="grid grid-cols-1 gap-6">
@@ -187,9 +154,18 @@ function RadneGrupe() {
                             <Users className="inline-block mr-1 h-4 w-4" />
                             {grupa.members} članova
                           </span>
-                          <button className="gf-button gf-button-primary rounded-md">
-                            Pridruži se
-                          </button>
+                          <div className="flex gap-2">
+                            <Link 
+                              to={`/radne-grupe/${grupa.category}`} 
+                              className="gf-button gf-button-outline rounded-md flex items-center"
+                            >
+                              Saznaj više
+                              <ArrowRight className="ml-1 h-4 w-4" />
+                            </Link>
+                            <button className="gf-button gf-button-primary rounded-md">
+                              Pridruži se
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>

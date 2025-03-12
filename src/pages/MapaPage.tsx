@@ -1,12 +1,31 @@
 import { useState, useEffect } from 'react'
-import { Search, Calendar, AlertCircle } from 'lucide-react'
+import { Search, Filter, Calendar, MapPin, Users, Info } from 'lucide-react'
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import L from 'leaflet'
 import BelgradeMap from '../components/map/BelgradeMap'
 import FirebaseService, { Assembly, localCommunities, SIGNATURE_THRESHOLD } from '../services/FirebaseService'
 
+// Definisanje custom ikona za markere
+const createCustomIcon = (color: string) => {
+  return L.divIcon({
+    className: 'custom-icon',
+    html: `<div style="background-color: ${color}; width: 30px; height: 30px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"></div>`,
+    iconSize: [30, 30],
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30]
+  })
+}
+
+// Ikone za različite statuse
+const redIcon = createCustomIcon('#a01c1c') // sazvano
+const lightRedIcon = createCustomIcon('#ff6b6b') // nije-sazvano
+
 function MapaPage() {
   const [searchTerm, setSearchTerm] = useState('')
+  const [selectedType, setSelectedType] = useState<string | null>(null)
   const [selectedDate, setSelectedDate] = useState<string>('')
-  const [selectedCommunity, setSelectedCommunity] = useState<string | null>(null)
+  const [activeLocation, setActiveLocation] = useState<number | null>(null)
+  const [mapLoaded, setMapLoaded] = useState(false)
   const [assemblies, setAssemblies] = useState<Assembly[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -24,6 +43,11 @@ function MapaPage() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  useEffect(() => {
+    // Postavite mapLoaded na true kada se komponenta montira
+    setMapLoaded(true)
+  }, [])
+
   // Fetch assemblies on component mount
   useEffect(() => {
     const fetchAssemblies = async () => {
@@ -40,6 +64,95 @@ function MapaPage() {
 
     fetchAssemblies()
   }, [])
+
+  const eventTypes = ['Svi događaji', 'Zbor', 'Plenum', 'Radna grupa', 'Akcija']
+
+  const locations = [
+    {
+      id: 1,
+      name: 'Mesna zajednica Centar',
+      type: 'Zbor',
+      status: 'sazvano', // sazvano or nije-sazvano
+      date: '2023-06-15',
+      time: '18:00',
+      address: 'Ulica Slobode 1, Beograd',
+      description: 'Zbor građana mesne zajednice Centar o problemima saobraćaja i parkinga.',
+      attendees: 28,
+      coordinates: { lat: 44.816667, lng: 20.466667 },
+    },
+    {
+      id: 2,
+      name: 'Mesna zajednica Novi Grad',
+      type: 'Zbor',
+      status: 'nije-sazvano',
+      date: '',
+      time: '',
+      address: 'Bulevar Oslobođenja 15, Beograd',
+      description: 'Još uvek nije sazvan zbor za ovu mesnu zajednicu.',
+      attendees: 0,
+      coordinates: { lat: 44.818333, lng: 20.468333 },
+    },
+    {
+      id: 3,
+      name: 'Kulturni centar',
+      type: 'Plenum',
+      status: 'sazvano',
+      date: '2023-06-18',
+      time: '19:00',
+      address: 'Trg Republike 1, Beograd',
+      description: 'Plenum o kulturnoj politici i finansiranju nezavisne scene.',
+      attendees: 45,
+      coordinates: { lat: 44.815555, lng: 20.465555 },
+    },
+    {
+      id: 4,
+      name: 'Park Prijateljstva',
+      type: 'Akcija',
+      status: 'sazvano',
+      date: '2023-06-20',
+      time: '10:00',
+      address: 'Park Prijateljstva, Novi Beograd',
+      description: 'Akcija čišćenja i uređenja parka.',
+      attendees: 15,
+      coordinates: { lat: 44.820000, lng: 20.470000 },
+    },
+    {
+      id: 5,
+      name: 'Opština Vračar',
+      type: 'Radna grupa',
+      status: 'sazvano',
+      date: '2023-06-22',
+      time: '17:30',
+      address: 'Njegoševa 77, Beograd',
+      description: 'Sastanak radne grupe za ekologiju.',
+      attendees: 12,
+      coordinates: { lat: 44.802222, lng: 20.475555 },
+    },
+    {
+      id: 6,
+      name: 'Mesna zajednica Dorćol',
+      type: 'Zbor',
+      status: 'sazvano',
+      date: '2023-06-25',
+      time: '18:30',
+      address: 'Cara Dušana 35, Beograd',
+      description: 'Zbor građana o problemima komunalne infrastrukture.',
+      attendees: 32,
+      coordinates: { lat: 44.825555, lng: 20.462222 },
+    },
+  ]
+
+  const filteredLocations = locations.filter((location) => {
+    const matchesSearch = location.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         location.address.toLowerCase().includes(searchTerm.toLowerCase())
+    
+    const matchesType = selectedType === 'Svi događaji' || selectedType === null || 
+                       location.type === selectedType
+    
+    const matchesDate = !selectedDate || location.date === selectedDate
+    
+    return matchesSearch && matchesType && matchesDate
+  })
 
   // Handle marker click on the map
   const handleMarkerClick = (localCommunityId: string) => {
@@ -236,12 +349,6 @@ function MapaPage() {
     }
   };
 
-  // Filter communities based on search term
-  const filteredCommunities = localCommunities.filter(community => {
-    const matchesSearch = community.name.toLowerCase().includes(searchTerm.toLowerCase())
-    return matchesSearch
-  })
-
   // Get community name by ID
   const getCommunityName = (communityId: string): string => {
     const community = localCommunities.find(c => c.id === communityId)
@@ -250,24 +357,39 @@ function MapaPage() {
 
   return (
     <div className="pt-16">
-      <section className="bg-muted py-12">
+      <section className="bg-muted py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-3xl font-bold mb-4">Mapa mesnih zajednica Beograda</h1>
-            <p className="text-lg text-muted-foreground mb-6">
-              Pronađite najbliže zborove u vašem okruženju ili pokrenite inicijativu za sazivanje zbora u vašoj mesnoj zajednici.
+            <h1 className="text-4xl font-bold mb-6">Interaktivna mapa</h1>
+            <p className="text-xl text-muted-foreground mb-8">
+              Pronađite najbliže zborove, plenume i aktivnosti u vašem okruženju. Filtrirajte po
+              datumu, vrsti događaja i lokaciji.
             </p>
 
-            <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <div className="flex flex-col md:flex-row gap-4 mb-8">
               <div className="relative flex-grow">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
                 <input
                   type="text"
-                  placeholder="Pretraži po mesnoj zajednici..."
+                  placeholder="Pretraži po lokaciji..."
                   className="w-full pl-10 pr-4 py-3 rounded-md border border-input bg-background"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
+              </div>
+              <div className="relative">
+                <select
+                  className="w-full md:w-48 pl-4 pr-10 py-3 rounded-md border border-input bg-background appearance-none"
+                  value={selectedType || 'Svi događaji'}
+                  onChange={(e) => setSelectedType(e.target.value)}
+                >
+                  {eventTypes.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+                <Filter className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground pointer-events-none" />
               </div>
               <div className="relative">
                 <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
@@ -279,59 +401,177 @@ function MapaPage() {
                 />
               </div>
             </div>
-            
-            {successMessage && (
-              <div className="mt-4 bg-green-100 border border-green-200 text-green-800 rounded-md p-4 animate-fade-in">
-                <p className="text-sm">{successMessage}</p>
-              </div>
-            )}
-            
-            {error && (
-              <div className="mt-4 bg-destructive/10 border border-destructive/20 text-destructive rounded-md p-4 animate-fade-in">
-                <p className="text-sm">{error}</p>
-              </div>
-            )}
           </div>
         </div>
       </section>
 
-      <section className="py-8">
+      <section className="py-12">
         <div className="container mx-auto px-4">
-          {loading ? (
-            <div className="flex items-center justify-center h-[600px]">
-              <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-              <span className="ml-3 text-muted-foreground">Učitavanje mape...</span>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 bg-muted rounded-lg overflow-hidden h-[600px] relative">
+              {mapLoaded ? (
+                <MapContainer 
+                  center={[44.816667, 20.466667]} 
+                  zoom={13} 
+                  style={{ height: '100%', width: '100%' }}
+                >
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  />
+                  
+                  {filteredLocations.map((location) => (
+                    <Marker 
+                      key={location.id}
+                      position={[location.coordinates.lat, location.coordinates.lng]}
+                      icon={location.status === 'sazvano' ? redIcon : lightRedIcon}
+                      eventHandlers={{
+                        click: () => {
+                          setActiveLocation(location.id)
+                        }
+                      }}
+                    >
+                      <Popup>
+                        <div className="p-2">
+                          <h3 className="font-bold text-lg">{location.name}</h3>
+                          <p className="text-sm">{location.address}</p>
+                          {location.status === 'sazvano' && (
+                            <p className="text-sm mt-1">
+                              {new Date(location.date).toLocaleDateString('sr-RS')} u {location.time}
+                            </p>
+                          )}
+                          <p className="text-sm mt-2">{location.description}</p>
+                        </div>
+                      </Popup>
+                    </Marker>
+                  ))}
+                </MapContainer>
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center bg-muted-foreground/10">
+                  <div className="text-center">
+                    <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">
+                      Učitavanje mape...
+                    </p>
+                  </div>
                 </div>
-          ) : (
-            <div className="bg-muted rounded-lg overflow-hidden h-[700px] relative">
-              <BelgradeMap 
-                assemblies={assemblies}
-                onMarkerClick={handleMarkerClick}
-                selectedCommunity={selectedCommunity}
-                onScheduleAssembly={handleScheduleSubmit}
-                onRegisterAttendee={handleRegisterAttendee}
-              />
+              )}
 
               {/* Map Legend */}
-              <div className="absolute bottom-4 left-4 bg-background p-4 rounded-md shadow-md">
+              <div className="absolute bottom-4 left-4 bg-background p-4 rounded-md shadow-md z-[1000]">
                 <h3 className="text-sm font-medium mb-2">Legenda</h3>
                 <div className="space-y-2">
                   <div className="flex items-center">
-                    <div className="h-4 w-4 rounded-full bg-red-600 mr-2"></div>
-                    <span className="text-xs">Zbor nije zakazan</span>
+                    <div className="h-4 w-4 rounded-full map-status-yellow mr-2"></div>
+                    <span className="text-xs">Zbor nije sazvan</span>
                   </div>
                   <div className="flex items-center">
-                    <div className="h-4 w-4 rounded-full bg-yellow-500 mr-2"></div>
-                    <span className="text-xs">Zbor je zakazan (manje od {SIGNATURE_THRESHOLD} potpisa)</span>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="h-4 w-4 rounded-full bg-green-600 mr-2"></div>
-                    <span className="text-xs">Zbor je potvrđen (više od {SIGNATURE_THRESHOLD} potpisa)</span>
+                    <div className="h-4 w-4 rounded-full map-status-blue mr-2"></div>
+                    <span className="text-xs">Zbor je sazvan</span>
                   </div>
                 </div>
               </div>
             </div>
-          )}
+
+            <div className="bg-card rounded-lg shadow-sm border border-border overflow-hidden">
+              <div className="p-4 border-b border-border">
+                <h2 className="text-lg font-medium">Lokacije ({filteredLocations.length})</h2>
+              </div>
+
+              <div className="overflow-y-auto max-h-[520px]">
+                {filteredLocations.length === 0 ? (
+                  <div className="p-6 text-center">
+                    <p className="text-muted-foreground">
+                      Nema lokacija koje odgovaraju vašoj pretrazi.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-border">
+                    {filteredLocations.map((location) => (
+                      <div
+                        key={location.id}
+                        className={`p-4 cursor-pointer hover:bg-muted/50 transition-colors ${
+                          activeLocation === location.id ? 'bg-muted/50' : ''
+                        }`}
+                        onClick={() => setActiveLocation(location.id)}
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <h3 className="font-medium">{location.name}</h3>
+                          <span
+                            className={`px-2 py-1 text-xs font-medium rounded-full ${
+                              location.status === 'sazvano'
+                                ? 'bg-primary/10 text-primary'
+                                : 'bg-muted-foreground/10 text-muted-foreground'
+                            }`}
+                          >
+                            {location.type}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center text-sm text-muted-foreground mb-2">
+                          <MapPin className="h-4 w-4 mr-1" />
+                          <span>{location.address}</span>
+                        </div>
+
+                        {location.status === 'sazvano' ? (
+                          <>
+                            <div className="flex items-center text-sm text-muted-foreground mb-2">
+                              <Calendar className="h-4 w-4 mr-1" />
+                              <span>
+                                {new Date(location.date).toLocaleDateString('sr-RS')} u {location.time}
+                              </span>
+                            </div>
+
+                            <div className="flex items-center text-sm text-muted-foreground">
+                              <Users className="h-4 w-4 mr-1" />
+                              <span>{location.attendees} učesnika</span>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="flex items-center text-sm text-muted-foreground">
+                            <Info className="h-4 w-4 mr-1" />
+                            <span>Još uvek nije sazvan zbor</span>
+                          </div>
+                        )}
+
+                        {activeLocation === location.id && (
+                          <div className="mt-4 pt-4 border-t border-border">
+                            <p className="text-sm text-muted-foreground mb-4">
+                              {location.description}
+                            </p>
+                            {location.status === 'sazvano' ? (
+                              <button className="w-full px-4 py-2 bg-primary text-white rounded-md text-sm font-medium hover:bg-primary/90 transition-colors">
+                                Prijavi se za učešće
+                              </button>
+                            ) : (
+                              <button className="w-full px-4 py-2 bg-secondary text-foreground rounded-md text-sm font-medium hover:bg-secondary/80 transition-colors">
+                                Inicijativa za sazivanje
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-12 bg-muted">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-2xl font-bold mb-4">Želite da organizujete zbor u vašoj mesnoj zajednici?</h2>
+            <p className="text-muted-foreground mb-6">
+              Ako želite da pokrenete inicijativu za sazivanje zbora u vašoj mesnoj zajednici,
+              možete to učiniti kroz našu platformu.
+            </p>
+            <button className="px-6 py-3 bg-primary text-white rounded-md font-medium hover:bg-primary/90 transition-colors inline-flex items-center justify-center">
+              Pokreni inicijativu
+            </button>
+          </div>
         </div>
       </section>
 
