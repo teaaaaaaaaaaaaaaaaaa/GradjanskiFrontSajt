@@ -129,7 +129,7 @@ function ZboroviPage() {
             Na mapi su prikazane sve mesne zajednice, a svaki zbor označen je odgovarajućom bojom:
           </p>
 
-          <ul className="mb-10 text-lg space-y-4 list-none">
+          <ul className="mb-4 text-lg space-y-4 list-none">
             <li className="text-right">
               <span className="font-bold">Crveno dugme:</span> Ako zbor još uvek nije predložen, građanin može biti prvi
               koji će inicirati organizovanje budućeg zbora klikom na crveno dugme.
@@ -143,14 +143,12 @@ function ZboroviPage() {
               dobija link za pristup Telegram grupi, koja je glavni kanal za dalju komunikaciju i organizaciju.
             </li>
           </ul>
-
-          <h2 className="text-2xl md:text-3xl font-bold mt-12 mb-6 text-red-700">KAKO KORISTITI STRANICU?</h2>
         </div>
       </section>
 
       {/* Sekcija sa koracima - centrirana */}
       <section className="bg-white py-12">
-        <h2 className="text-3xl md:text-5xl font-bold text-center mb-10 md:mb-16 text-red-700">
+        <h2 className="text-3xl md:text-5xl font-bold text-center mb-6 md:mb-16 text-red-700">
           ŽELIŠ DA SE PRIKLJUČIŠ? POSTUPAK JE JEDNOSTAVAN!
         </h2>
 
