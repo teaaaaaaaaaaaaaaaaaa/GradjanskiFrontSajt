@@ -1,0 +1,7 @@
+{
+  "buildCommand": "CI=false npm run build",
+  "framework": "vite",
+  "outputDirectory": "dist",
+  "installCommand": "npm install",
+  "devCommand": "npm run dev"
+} 
